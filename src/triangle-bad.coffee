@@ -37,4 +37,3 @@ class Triangle_bad
     return 'NORMAL'
 
 module.exports = Triangle_bad
-

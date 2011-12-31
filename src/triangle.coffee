@@ -39,5 +39,3 @@ class Triangle
     return 'NORMAL'
 
 module.exports = Triangle
-
-console.log (new Triangle).kind(0,0,0)
