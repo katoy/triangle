@@ -1,13 +1,17 @@
-ß
+USAGE
+======
 
-$ git clone *********
-$ cd triangle
+    $ git clone https://github.com/katoy/triangle
+    $ cd triangle
+    
+    $ cake 
+    
+    $ cake setup clean compile
+    
+    $ cake spec
 
-$ cake 
-
-$ cake setup clean compile
-
-$ cake spec
+Description
+============
 
 This is a sample for using coffeescriot and jasmine-node.
 
@@ -26,8 +30,8 @@ src/traiangke*.coffee として２つのクラスを実装し、
 しかし、実装コード中では、途中の演算結果が [-100..100] を超えると exception　が
 発生するようにしてあります。
 
- src/triangle.coffee は処理中にオーバー・アンダーフローが発生しない工夫をしてあります。
- src/triangle-bad.coffee は処理中にオーバー・アンダーフローが発生する可能性があります。
+src/triangle.coffee は処理中にオーバー・アンダーフローが発生しない工夫をしてあります。
+src/triangle-bad.coffee は処理中にオーバー・アンダーフローが発生する可能性があります。
 
  jasmin-node でのテストでは、その状況をキャッチできるテストケースを書いてあります。
 
