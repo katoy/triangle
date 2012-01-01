@@ -6,21 +6,19 @@
 Triangle_bad = require '../src/triangle-bad'
 Triangle_cases = require './triangle_cases'
 
-cases_result_555 = Triangle_cases.cases_result_555
-
 ans = (a,b,c) ->
-  cases_result_555["#{a},#{b},#{c}"]
+  Triangle_cases.cases_result_555["#{a},#{b},#{c}"]
 
 describe 'Triangle_bad:正数と０', ->
   beforeEach ->
     @triangle = new Triangle_bad()
 
-  it 'Triangle:負の数', ->
+  it '[0..4] * [0..4] * [0..4]', ->
     for a in [0..4]
       for b in [0..4]
         for c in [0..4]
           # kind() の結果をチェックする。
-          expect("#{a},#{b},#{c}:#{@triangle.kind(a, b ,c)}").toEqual("#{a},#{b},#{c}:#{ans(a,b,c)}")
+          expect("0 #{a},#{b},#{c}:#{@triangle.kind(a, b ,c)}").toEqual("0 #{a},#{b},#{c}:#{ans(a,b,c)}")
 
           # a,b,c の順番に kind() が依存していないことをチェックする
           expect("1 #{a},#{b},#{c}:#{@triangle.kind(a, b ,c)}").toEqual("1 #{a},#{b},#{c}:#{@triangle.kind(a,c,b)}")
@@ -28,6 +26,14 @@ describe 'Triangle_bad:正数と０', ->
           expect("3 #{a},#{b},#{c}:#{@triangle.kind(a, b ,c)}").toEqual("3 #{a},#{b},#{c}:#{@triangle.kind(b,c,a)}")
           expect("4 #{a},#{b},#{c}:#{@triangle.kind(a, b ,c)}").toEqual("4 #{a},#{b},#{c}:#{@triangle.kind(c,a,b)}")
           expect("5 #{a},#{b},#{c}:#{@triangle.kind(a, b ,c)}").toEqual("5 #{a},#{b},#{c}:#{@triangle.kind(c,b,a)}")
+
+describe 'Triangle_bad:直角三角形, その他', ->
+  beforeEach ->
+    @triangle = new Triangle_bad()
+
+  it '直角三角形, その他', ->
+    for [a, b, c, kind] in Triangle_cases.cases_result_misc
+      expect("#{a},#{b},#{c}:#{@triangle.kind(a, b ,c)}").toEqual("#{a},#{b},#{c}:#{kind}")
 
 describe 'Triangle_bad:最大・最小の整数', ->
   beforeEach ->
