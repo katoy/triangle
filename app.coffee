@@ -1,4 +1,5 @@
-express = require "express"
+express = require 'express'
+argv    = process.argv.slice(2);
 
 routes = require "./routes"
 User = require './src/triangle'
