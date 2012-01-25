@@ -6,7 +6,7 @@
 class Triangle_cases
   # [0..4] x [0..4] x [0..4] の網羅テスト
   @cases_result_555 :  {
-      '0,0,0': 'NG'
+    '0,0,0': 'NG'
     , '0,0,1': 'NG'
     , '0,0,0': 'NG'
     , '0,0,1': 'NG'
@@ -141,12 +141,14 @@ class Triangle_cases
   #   > 三平方の定理
 
   # 直角三角形、その他
-  @cases_result_misc :  [
+  @cases_result_misc_0 :  [
       [90,90,90,   'REGULAR']
     , [90,90,1,    'ISO']
     , [90,45,45,   'NG']
+    ]
 
-    , [3,4,5,      'RIGHT']
+  @cases_result_misc_1 :  [
+      [3,4,5,      'RIGHT']
     , [5,12,13,    'RIGHT']
     , [6,8,10,     'RIGHT']
     , [7,24,25,    'RIGHT']

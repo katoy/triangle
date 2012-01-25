@@ -7,3 +7,5 @@ benchmarks/out/*.out
 tests/*.js
 _site
 vendor
+src-inst/
+coverage.html

@@ -6,9 +6,14 @@ USAGE
     
     $ cake 
     
-    $ cake setup clean compile
+    $ cake setup
+
+    $ cake clean
+    $ cake compile
     
     $ cake spec
+
+    R cake test
 
 Description
 ============
@@ -33,11 +38,11 @@ src/traiangke*.coffee として２つのクラスを実装し、
 src/triangle.coffee は処理中にオーバー・アンダーフローが発生しない工夫をしてあります。
 src/triangle-bad.coffee は処理中にオーバー・アンダーフローが発生する可能性があります。
 
- jasmin-node でのテストでは、その状況をキャッチできるテストケースを書いてあります。
+spec/*.coffee のテストでは、その状況をキャッチできるテストケースを書いてあります。
 
- クラス実装、テストケースの編集に伴う coffeescrit -> javascript の compile,
- テストの実施、
- npm での modules の設定
- などを cake で行えるようにもしてあります。
+次の処理を cake で行えるようにもしてあります。
+ * クラス実装、テストケースの編集に伴う coffeescrit -> javascript の compile,
+ * テストの実施、
+ * npm での modules のインストール
  
 //--- End of File ---

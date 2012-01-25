@@ -3,8 +3,11 @@
 fs = require 'fs'
 util = require 'util'
 
+
 SRC_DIR = 'src'
+SRC_INST_DIR = 'src-inst'
 SPEC_DIR = 'spec'
+TEST_DIR = 'test'
 TOP_DIR = '.'
 
 appFiles = []
@@ -49,6 +52,14 @@ run = (args...) ->
   process.on 'SIGHUP', -> cmd.kill()
   cmd.on 'exit', (code) -> callback() if callback? and code is 0
 
+
+runSync = (str, callback) ->
+    exec str, (err, stdout, stderr) ->
+      console.log err  if err != null
+      console.log stderr if stderr != null
+      console.log stdout if !stdout != null
+      callback() if callback != null
+
 task 'count', 'how much files (*.coffee, *.js, *~)', ->
   finds([SRC_DIR, SPEC_DIR])
   util.log "#{appFiles.length} coffee files found."
@@ -88,3 +99,20 @@ task "setup", "setup node-modules",  ->
 
 task "spec", "spec", ->
   run "jasmine-node spec --coffee spec"
+
+task "test", "test and overage", ->
+  console.log "------------------------------------"
+  console.log "   After finished, See ./coverage.html for coverage."
+  console.log "------------------------------------"
+  run "vows --spec --cover-html"
+
+task "inst", "inst", ->
+  runSync "rm -fr #{SRC_INST_DIR}", () ->
+    run "mkdir #{SRC_INST_DIR}"
+
+  runSync "cake compile", () ->
+    runSync "jscoverage #{SRC_DIR} #{SRC_INST_DIR}", () ->
+      run "mv #{SRC_INST_DIR}/*.js #{SRC_DIR}"
+
+task "lint", "lint", ->
+    run "coffeelint *.coffee */*.coffee"

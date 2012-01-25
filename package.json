@@ -3,11 +3,21 @@
   , "version": "0.0.1"
   , "private": true
   , "dependencies": {
-      "express": "2.5.2"
-    , "stylus": ">= 0.0.1"
-    , "jade": ">= 0.0.1"
-    , "coffee-script": ""
-    , "jasmine-node": ""
-  }
+      "coffee-script": ">=1.2.0"
+    , "express": "2.5.2"
+    , "jade": ">= 0.20.0"
+    , "stylus": ">= 0.22.6"
 
+    , "vows": ">=0.6.1"
+    , "zombie": ">=0.12.13"
+
+    , "coffeelint": ""
+  }
+  , "engines" : { 
+       "node" : ">=0.6.7"
+  }
+ , "scripts": {
+    "test": "cake test"
+  , "start": "cake run"
+  }
 }

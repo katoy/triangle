@@ -1,11 +1,13 @@
 express = require 'express'
-argv    = process.argv.slice(2);
+argv    = process.argv.slice(2)
 
 routes = require "./routes"
 User = require './src/triangle'
 
 app = module.exports = express.createServer()
 app.configure ->
+  app.use express.logger()
+
   app.set "views", __dirname + "/views"
   app.set "view engine", "jade"
   app.use express.bodyParser()
