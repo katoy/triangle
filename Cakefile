@@ -98,7 +98,8 @@ task "setup", "setup node-modules",  ->
   run "npm install"
 
 task "spec", "spec", ->
-  run "jasmine-node spec --coffee spec"
+  # run "jasmine-node spec --coffee spec"
+  run "vows --spec"
 
 task "test", "test and overage", ->
   console.log "------------------------------------"
