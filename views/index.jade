@@ -1,3 +1,16 @@
 h1= title
 
+fieldset
+  h3= "3辺の長さ"
+  form
+    ul
+      li
+        input#data_a(name="data_a", class="required")
+      li
+        input#data_b(name="data_b", class="required")
+      li
+        input#data_c(name="data_c", class="required")
 
+    input#my_submit(name="my_submit", type="button", value="判定")
+    spawn= "　" 
+    spawn#result= ""

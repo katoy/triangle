@@ -13,8 +13,11 @@ USAGE
     
     $ cake spec
 
-    R cake test
+    $ cake test
 
+    $ dake run
+    then access http://localhot:3000
+    
 Description
 ============
 
@@ -44,5 +47,6 @@ spec/*.coffee のテストでは、その状況をキャッチできるテスト
  * クラス実装、テストケースの編集に伴う coffeescrit -> javascript の compile,
  * テストの実施、
  * npm での modules のインストール
+
  
 //--- End of File ---
