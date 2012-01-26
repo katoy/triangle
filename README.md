@@ -15,7 +15,7 @@ USAGE
 
     $ cake test
 
-    $ dake run
+    $ cake run
     then access http://localhot:3000
     
 Description
