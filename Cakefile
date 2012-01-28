@@ -99,13 +99,13 @@ task "setup", "setup node-modules",  ->
 
 task "spec", "spec", ->
   # run "jasmine-node spec --coffee spec"
-  run "vows --spec"
+  run "vows --spec spec/*_spec.coffee"
 
 task "test", "test and overage", ->
   console.log "------------------------------------"
   console.log "   After finished, See ./coverage.html for coverage."
   console.log "------------------------------------"
-  run "vows --spec --cover-html"
+  run "vows --spec --cover-html test/*.coffee"
 
 task "inst", "inst", ->
   runSync "rm -fr #{SRC_INST_DIR}", () ->
