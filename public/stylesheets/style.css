@@ -1,17 +1,15 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  padding: 10px;
+  font: 14px "Lucida Grande", "Lucida Sans Unicode", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", Helvetica, Arial, Verdana, sans-serif;
+  background-color: #ddf;
 }
 a {
   color: #00b7ff;
 }
-fieldset {
-  margin-bottom: 10px;
-}
-label {
+div.label {
   display: inline-block;
-  line-height: 1.8;
-  vertical-align: top;
+  width: 30px;
+  text-align: right;
 }
 input {
   font: 14px "Segoe UI", Arial, Helvetica, sans-serif;

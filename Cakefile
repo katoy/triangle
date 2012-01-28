@@ -117,3 +117,6 @@ task "inst", "inst", ->
 
 task "lint", "lint", ->
     run "coffeelint *.coffee */*.coffee"
+
+task "test", "test and overage", ->
+  run "vows --spec"

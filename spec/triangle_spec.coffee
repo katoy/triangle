@@ -37,11 +37,23 @@ vows.describe('Triangle:正数と０')
 
       '直角三角形, その他': (err, browser, status) ->
         for [a,b,c,kind] in Triangle_cases.cases_result_misc_0
-          assert.equal("#{a},#{b},#{c}:#{@triangle.kind(a, b ,c)}", "#{a},#{b},#{c}:#{kind}")
+          # a,b,c の順番に kind() が依存していないことをチェックする
+          assert.equal("1 #{a},#{b},#{c}:#{@triangle.kind(a, b, c)}", "1 #{a},#{b},#{c}:#{kind}")
+          assert.equal("2 #{a},#{b},#{c}:#{@triangle.kind(a, c, b)}", "2 #{a},#{b},#{c}:#{kind}")
+          assert.equal("3 #{a},#{b},#{c}:#{@triangle.kind(b, a, c)}", "3 #{a},#{b},#{c}:#{kind}")
+          assert.equal("4 #{a},#{b},#{c}:#{@triangle.kind(b, c, a)}", "4 #{a},#{b},#{c}:#{kind}")
+          assert.equal("5 #{a},#{b},#{c}:#{@triangle.kind(c, a, b)}", "5 #{a},#{b},#{c}:#{kind}")
+          assert.equal("6 #{a},#{b},#{c}:#{@triangle.kind(c, b, a)}", "6 #{a},#{b},#{c}:#{kind}")
 
       '直角三角形, その他': (err, browser, status) ->
         for [a,b,c,kind] in Triangle_cases.cases_result_misc_1
-          assert.equal("#{a},#{b},#{c}:#{@triangle.kind(a, b ,c)}", "#{a},#{b},#{c}:#{kind}")
+          # a,b,c の順番に kind() が依存していないことをチェックする
+          assert.equal("1 #{a},#{b},#{c}:#{@triangle.kind(a, b, c)}", "1 #{a},#{b},#{c}:#{kind}")
+          assert.equal("2 #{a},#{b},#{c}:#{@triangle.kind(a, c, b)}", "2 #{a},#{b},#{c}:#{kind}")
+          assert.equal("3 #{a},#{b},#{c}:#{@triangle.kind(b, a, c)}", "3 #{a},#{b},#{c}:#{kind}")
+          assert.equal("4 #{a},#{b},#{c}:#{@triangle.kind(b, c, a)}", "4 #{a},#{b},#{c}:#{kind}")
+          assert.equal("5 #{a},#{b},#{c}:#{@triangle.kind(c, a, b)}", "5 #{a},#{b},#{c}:#{kind}")
+          assert.equal("6 #{a},#{b},#{c}:#{@triangle.kind(c, b, a)}", "6 #{a},#{b},#{c}:#{kind}")
 
     "最大・最小の整数":
       topic: () ->

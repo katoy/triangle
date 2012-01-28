@@ -20,21 +20,23 @@ class Triangle_bad extends Triangle_base
     if (a < Triangle_bad.MIN_INT) || (Triangle_bad.MAX_INT < a) || (b < Triangle_bad.MIN_INT) || (Triangle_bad.MAX_INT < b) || (c < Triangle_bad.MIN_INT < b) || (Triangle_bad.MAX_INT < c)
       return 'NG-INPUT'
 
-    if (a <= 0 ) || (b <= 0) || (c <= 0)
-      return 'NG'
+    return 'NG' if (a <= 0 ) || (b <= 0) || (c <= 0)
+
+    return 'REGULAR' if (a == b) && (a == c)
 
     # 計算途中で overflow することがあるのを補足する。
-    if (a + b > Triangle_bad.MAX_INT) || (b + c > Triangle_bad.MAX_INT) || ( c + a > Triangle_bad.MAX_INT)
+    if (a + b > Triangle_bad.MAX_INT) || (b + c > Triangle_bad.MAX_INT) || (c + a > Triangle_bad.MAX_INT)
       throw "overflow! a + b = #{a + b}, b + c = #{b + c}, c + a = #{c + a}"
     if (a * a > Triangle_bad.MAX_INT) || (b * b > Triangle_bad.MAX_INT) || ( c * c > Triangle_bad.MAX_INT)
       throw "overflow! a^2 = #{a * a}, b^2 = #{b * b}, c^2 = #{c*c}, a^2 + b^2 = #{a*a + b*b}"
     if (a + b < Triangle_bad.MIN_INT) || (b + c < Triangle_bad.MIN_INT) || ( c + a < Triangle_bad.MIN_INT)
       throw "overflow! a + b = #{a + b}, b + c = #{b + c}, c + a = #{c + a}"
 
-    if ( a + b <= c) || (b + c <= a) || ( c + a<= b)
+    # ソートする
+    [a, b, c]  = [a, b, c].sort (a, b) -> (a - b)
+
+    if ( a + b <= c)
       return 'NG'
-    else if (a == b) && (a == c)
-      return 'REGULAR'
     else if ( a*a + b*b == c*c)
       return 'RIGHT'
     else if (a == b) || ( b == c) || (c == a)
