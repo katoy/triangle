@@ -1,26 +1,25 @@
 # あいうえお
 express = require 'express'
-triangle_bad = require './src/triangle-bad'
-triangle = require './src/triangle'
+triangle_bad = require './triangle-bad'
+triangle = require './triangle'
 
 logger = express.logger
 
-routes = require './routes'
-User = require './src/triangle'
+routes = require '../routes'
 
 app = module.exports = express.createServer()
 
 app.configure ->
-  app.use express.logger()
+  # app.use express.logger()
 
-  app.set 'views', __dirname + '/views'
+  app.set 'views', __dirname + '/../views'
   app.set 'view engine', 'jade'
   app.use express.bodyParser()
   app.use express.methodOverride()
 
-  app.use require('stylus').middleware(src: __dirname + '/public')
+  app.use require('stylus').middleware(src: __dirname + '/..//public')
   app.use app.router
-  app.use express.static(__dirname + '/public')
+  app.use express.static(__dirname + '/../public')
 
 app.configure 'development', ->
   app.use express.errorHandler(

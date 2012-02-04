@@ -3,7 +3,9 @@
 vows = require 'vows'
 assert = require 'assert'
 zombie = require 'zombie'
-app = require '../app'
+# app = require '../src/app'
+singleton_app = require './app_singleton'
+app = singleton_app.get()
 
 port = 3000
 baseUrl = "http://localhost:#{port}"
@@ -15,12 +17,12 @@ app.start port
 #   window.querySelector('#result')
 
 new_browser = () ->
-  browser = new zombie.Browser({ debug: true })
+  browser = new zombie.Browser({ debug: false })
   browser.runScripts = true
   browser.waitFor = 3000
   browser
 
-vows.describe("a sample vow")
+vows.describe("test for triangle_bad")
 .addBatch
   "check empty":
     topic: () ->
@@ -118,5 +120,51 @@ vows.describe("a sample vow")
           pressButton('#my_submit_0', @callback)
       "see result" : (browser) ->
         assert.equal(browser.text('#result'), 'overflow! a + b = 103, b + c = 105, c + a = 104')
+
+  "check 1.2 10 10":
+    topic: () ->
+      new_browser().visit baseUrl, @callback
+    '[1.2 10 10]':
+      topic: (browser) ->
+        browser.
+            fill('data_a', '1.2').fill('data_b', '10').fill('data_c', '10').
+          pressButton('#my_submit_0', @callback)
+      "see result" : (browser) ->
+        assert.equal(browser.text('#result'), 'a:NG-INPUT ')
+
+  "check 10 1.2 10":
+    topic: () ->
+      new_browser().visit baseUrl, @callback
+    '[10 1.2 10]':
+      topic: (browser) ->
+        browser.
+            fill('data_a', '10').fill('data_b', '1.2').fill('data_c', '10').
+          pressButton('#my_submit_0', @callback)
+      "see result" : (browser) ->
+        assert.equal(browser.text('#result'), 'b:NG-INPUT ')
+
+  "check 10 10 1.2":
+    topic: () ->
+      new_browser().visit baseUrl, @callback
+    '[10 10 1.2]':
+      topic: (browser) ->
+        browser.
+            fill('data_a', '10').fill('data_b', '10').fill('data_c', '1.2').
+          pressButton('#my_submit_0', @callback)
+      "see result" : (browser) ->
+        assert.equal(browser.text('#result'), 'c:NG-INPUT ')
+
+  "check get_method":
+    topic: () ->
+      new_browser().visit baseUrl + "/triangle_0?a=1&b=1&c=1", @callback
+    'get [1 1 1]':
+      topic: (browser) ->
+        assert.equal(browser.html(), "")
+
+  "check get_method":
+    topic: () ->
+      new_browser().visit baseUrl + "/triangle_0?a=1&b=1&c=1", @callback
+    'get [1 1 1]':  (browser) ->
+      assert.equal(browser.html(), '{"method":0,"ans":"REGULAR","err":"","params":{"a":"1","b":"1","c":"1"}}')
 
 .export module

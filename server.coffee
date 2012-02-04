@@ -1,5 +1,5 @@
 
-app = require './app'
+app = require './src/app'
 
 argv = process.argv.slice(2)
 argv = [3000] if argv.length == 0
