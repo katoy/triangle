@@ -3,35 +3,35 @@ express = require 'express'
 triangle_bad = require './src/triangle-bad'
 triangle = require './src/triangle'
 
-argv = []
-argv    = process.argv.slice(2)  if process.argv
+logger = express.logger
 
-routes = require "./routes"
+routes = require './routes'
 User = require './src/triangle'
 
 app = module.exports = express.createServer()
+
 app.configure ->
   app.use express.logger()
 
-  app.set "views", __dirname + "/views"
-  app.set "view engine", "jade"
+  app.set 'views', __dirname + '/views'
+  app.set 'view engine', 'jade'
   app.use express.bodyParser()
   app.use express.methodOverride()
 
-  app.use require("stylus").middleware(src: __dirname + "/public")
+  app.use require('stylus').middleware(src: __dirname + '/public')
   app.use app.router
-  app.use express.static(__dirname + "/public")
+  app.use express.static(__dirname + '/public')
 
-app.configure "development", ->
+app.configure 'development', ->
   app.use express.errorHandler(
     dumpExceptions: true
     showStack: true
   )
 
-app.configure "production", ->
+app.configure 'production', ->
   app.use express.errorHandler()
 
-app.get "/", routes.index
+app.get '/', routes.index
 
 re = new RegExp(/^\d*$/)
 
@@ -40,13 +40,13 @@ my_parseInts = (vals) ->
   for k, v of vals
     res = ''
 
-    if v == undefined || v.trim() == ""
+    if v == undefined || v.trim() == ''
       res = Error('empty')
     else
       v = v.trim()
       m = v.match(re)
       if m == null
-        res =  Error("NG-INPUT")
+        res =  Error('NG-INPUT')
       else
         res = parseInt(v)
     parsed[k] = res
@@ -55,13 +55,13 @@ my_parseInts = (vals) ->
 
 eval_triangle = (req, res, kind) ->
   err = ''
-  ans = ""
+  ans = ''
 
   params = {'a': req.param('a'), 'b': req.param('b'), 'c':req.param('c') }
   parsed = my_parseInts params
 
   for k, v of parsed
-    err += "#{k}:#{v.message} " if typeof(v) == "object"
+    err += "#{k}:#{v.message} " if typeof(v) == 'object'
 
   if err == ''
     tr = null;
@@ -89,6 +89,10 @@ app.post '/triangle_1', (req, res) ->
 app.get '/triangle_1', (req, res) ->
   eval_triangle(req, res, 0)
 
-port = argv[0] || process.env.PORT || 3000
-app.listen port
-console.log "Express server listening on port %d in %s mode", app.address().port, app.settings.env
+# port = argv[0] || process.env.PORT || 3000
+# app.listen port
+# console.log 'Express server listening on port %d in %s mode', app.address().port, app.settings.env
+module.exports.start = (port) ->
+  app.listen port
+  console.log "Express server listening on port #{port} in #{app.settings.env} mode"
+

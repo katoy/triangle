@@ -26,7 +26,7 @@ class Triangle extends Triangle_base
 
     # 計算途中で overflow することがあるのを補足する。
     if (c - b < Triangle.MIN_INT) || (a - c < Triangle.MIN_INT) || (b - a < Triangle.MIN_INT)
-      throw "overflow! c - a = #{c - a}, a - c = #{a - c}, b - a = #{b - a}"
+      throw "overflow! c - b = #{c - b}, a - c = #{a - c}, b - a = #{b - a}"
     if (c - a > Triangle.MAX_INT) || (a - c > Triangle.MAX_INT) || (b - a > Triangle.MAX_INT)
       throw "overflow! c - a = #{c - a}, a - c = #{a - c}, b - a = #{b - a}"
 

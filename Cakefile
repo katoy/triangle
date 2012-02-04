@@ -99,13 +99,13 @@ task "setup", "setup node-modules",  ->
 
 task "spec", "spec", ->
   # run "jasmine-node spec --coffee spec"
-  run "vows --spec --cover-html spec/triangle_spec.coffee spec/triangle-bad_spec.coffee"
+  run "vows spec/*_spec.coffee --spec --cover-html -v"
 
 task "test", "test and overage", ->
   console.log "------------------------------------"
   console.log "   After finished, See ./coverage.html for coverage."
   console.log "------------------------------------"
-  run "vows --spec --cover-html test/triangle_test.coffee"
+  run "vows test/triangle_test*.coffee --spec --cover-html"
 
 task "inst", "inst", ->
   runSync "rm -fr #{SRC_INST_DIR}", () ->
@@ -116,5 +116,5 @@ task "inst", "inst", ->
       run "mv #{SRC_INST_DIR}/*.js #{SRC_DIR}"
 
 task "lint", "lint", ->
-    run "coffeelint *.coffee */*.coffee"
+    run "coffee --lint *.coffee */*.coffee"
 
