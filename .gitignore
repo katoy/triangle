@@ -8,4 +8,5 @@ tests/*.js
 _site
 vendor
 src-inst/
-coverage.html
+coverage*.html
+public/coverage*.html

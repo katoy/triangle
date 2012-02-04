@@ -7,11 +7,11 @@ zombie = require 'zombie'
 singleton_app = require './app_singleton'
 app = singleton_app.get()
 
-port = 3000
-baseUrl = "http://localhost:#{port}"
-
 # Start server for test.
-app.start port
+app.start()
+
+port = app.port
+baseUrl = "http://localhost:#{port}"
 
 # get_result =  (window) ->
 #   window.querySelector('#result')

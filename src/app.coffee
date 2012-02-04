@@ -10,7 +10,7 @@ routes = require '../routes'
 app = module.exports = express.createServer()
 
 app.configure ->
-  # app.use express.logger()
+  app.use express.logger()
 
   app.set 'views', __dirname + '/../views'
   app.set 'view engine', 'jade'

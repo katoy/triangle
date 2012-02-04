@@ -1,19 +1,21 @@
+/**  スタイルシート  **/
 body {
   padding: 10px;
-  font: 14px "Lucida Grande", "Lucida Sans Unicode", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", Helvetica, Arial, Verdana, sans-serif;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", Helvetica, Arial, Verdana, sans-serif;
   background-color: #ddf;
-}
-a {
-  color: #00b7ff;
 }
 div.label {
   display: inline-block;
-  width: 30px;
+  width: 2em;
   text-align: right;
+  margin-right: 4px;
 }
 input {
   font: 14px "Segoe UI", Arial, Helvetica, sans-serif;
   margin-top: 4px;
+}
+.hen {
+  width: 6em;
 }
 .watermark {
   color: #999 !important;

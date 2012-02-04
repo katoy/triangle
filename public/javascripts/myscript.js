@@ -14,7 +14,9 @@ $(function () {
         return s;
     }
 
-    $(".required").watermark("Required", "watermark");
+    $("#data_a").watermark("辺 a の長さ", "watermark");
+    $("#data_b").watermark("辺 b の長さ", "watermark");
+    $("#data_c").watermark("辺 c の長さ", "watermark");
 
     $("#my_submit_0").click( function() {
         $.ajax({

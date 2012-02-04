@@ -4,6 +4,8 @@ USAGE
     $ git clone https://github.com/katoy/triangle
     $ cd triangle
     
+    $ npm install -g coffee-script
+    
     $ cake 
     
     $ cake setup
@@ -21,9 +23,9 @@ USAGE
 Description
 ============
 
-This is a sample for using coffeescriot and jasmine-node.
+This is a sample for using coffeescriot, zombie and vows.
 
-これは coffeescript と jasmone-node の利用例です。
+これは coffeescript と zomzie と vows の利用例です。
 
 src/traiangke*.coffee として２つのクラスを実装し、
 それを spec/*.coffee でテストします。
@@ -43,10 +45,15 @@ src/triangle-bad.coffee は処理中にオーバー・アンダーフローが�
 
 spec/*.coffee のテストでは、その状況をキャッチできるテストケースを書いてあります。
 
+web アプリを server.coffee として作成してあります。
+cake test では、 zombie をつかって web ブラウザ経由でテストをします。
+
 次の処理を cake で行えるようにもしてあります。
  * クラス実装、テストケースの編集に伴う coffeescrit -> javascript の compile,
  * テストの実施、
+ * テストカバレッジ計測機能を *.js に組み込む。
  * npm での modules のインストール
 
+ $ cake とコマンドラインで入力すれば、cake で指定出来るタスクが一覧表示されます。
  
 //--- End of File ---
