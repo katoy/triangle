@@ -10,3 +10,4 @@ vendor
 src-inst/
 coverage*.html
 public/coverage*.html
+*.log
