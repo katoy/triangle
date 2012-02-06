@@ -18,7 +18,7 @@ USAGE
     $ cake test
 
     $ cake run
-    then access http://localhot:3000
+    then access http://localhost:3000
     
 Description
 ============
