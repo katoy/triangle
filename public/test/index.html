@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>Express</title>
+    <meta charset="utf-8"/>
+    <script src="../javascripts/jquery-1.7.1.min.js"></script>
+    <script src="../javascripts/jquery.watermark.min.js"></script>
+    <script src="../javascripts/myscript.js"></script>
+    <link rel="stylesheet" href="../stylesheets/trontastic/jquery-ui-1.8.16.custom.css"/>
+    <link rel="stylesheet" href="../stylesheets/style.css"/>
+
+    <link rel="stylesheet" href="../qunit/qunit.css" type="text/css" media="screen">
+    <script type="text/javascript" src="../qunit/qunit.js"></script>
+    <script type="text/javascript" src="../javascripts/myscript.js"></script>
+    <script type="text/javascript" src="test_0.js"></script>
+    <script type="text/javascript" src="test_1.js"></script>
+
+</head>
+  
+  <body>
+    <h1>Express</h1>
+    <fieldset><h3>3辺の長さを指定してください。三角形の形状を判定します。</h3>
+      <p>[-100 ... 100] の範囲の整数を妥当な指定と見なします。 </p>
+      <form>
+	<div>
+	  <div class="label">a:</div>
+	  <input id="data_a" name="data_a" class="required hen"/>
+	</div>
+	<div>
+	  <div class="label">b:</div>
+	  <input id="data_b" name="data_b" class="required hen"/>
+	</div>
+	<div>
+	  <div class="label">c:</div>
+	  <input id="data_c" name="data_c" class="required hen"/>
+	</div>
+	<input id="my_submit_0" name="my_submit_0" type="button" value="判定0"/>
+	<input id="my_submit_1" name="my_submit_1" type="button" value="判定1"/>
+	<spawn>　</spawn><spawn id="result"></spawn>
+      </form>
+    </fieldset>
+
+  <div class='qtestdiv'>
+    <ol id="qunit-tests"></ol>
+    <div id="qunit-fixture">test markup</div>
+  </div>
+
+  </body>
+</html>

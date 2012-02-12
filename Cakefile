@@ -119,6 +119,15 @@ task "inst", "inst", ->
     runSync "jscoverage #{SRC_DIR} #{SRC_INST_DIR}", () ->
       run "mv #{SRC_INST_DIR}/*.js #{SRC_DIR}"
 
+task "test-client", "test-client", ->
+  console.log "------------------------------------"
+  console.log "   1. run server ($ cake run)"
+  console.log "   2. access http://localhost:3000/test"
+  console.log "     or "
+  console.log "     $ phantomjs public/test/run-qunit.coffee http://localhost:3000/test "
+  console.log "   3. stop server ( ctrl-c)"
+  console.log "------------------------------------"
+
 task "lint", "lint", ->
     run "coffee --lint *.coffee */*.coffee"
 
