@@ -1,4 +1,6 @@
 $(function () {
+    "use strict";
+    
     function triangle_name(s) {
         if (s == 'NORMAL') {
             return "一般の三角形";
@@ -22,6 +24,7 @@ $(function () {
         $.ajax({
             type: 'POST',
             url: '/triangle_0',
+            dataType: "jsonp",
             data: {a: $("#data_a").val(),
                    b: $("#data_b").val(),
                    c: $("#data_c").val()
@@ -37,8 +40,8 @@ $(function () {
                     $("#result").text(triangle_name(data.ans));
                 }
             },
-            error: function() {
-                alert(data.err);
+            error: function(MLHttpRequest, textStatus, error) {
+                alert(error);
             },
             complete: function() {
                 $('#my_submit_0').removeAttr('disabled');
@@ -51,6 +54,7 @@ $(function () {
         $.ajax({
             type: 'POST',
             url: '/triangle_1',            
+            dataType: "jsonp",
             data: {a: $("#data_a").val(),
                    b: $("#data_b").val(),
                    c: $("#data_c").val()
@@ -66,8 +70,8 @@ $(function () {
                     $("#result").text(triangle_name(data.ans));
                 }
             },
-            error: function() {
-                alert(data.err);
+            error: function(MLHttpRequest, textStatus, error) {
+                alert(error);
             },
             complete: function() {
                 $('#my_submit_1').removeAttr('disabled');

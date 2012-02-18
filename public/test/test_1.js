@@ -1,6 +1,8 @@
 // 三角形の形状判定
 
-var wati_time = 1000;
+"use strict";
+
+var wait_time = 1000;
 
 module("async test", {
     setup: function() {
@@ -31,7 +33,7 @@ asyncTest("判定 1: '', '', ''", function() {
     setTimeout(function(){
 	equal($('#result').text(), "a:empty b:empty c:empty ");
 	start();
-    }, wati_time);
+    }, wait_time);
 
 });
 
@@ -43,7 +45,7 @@ asyncTest("判定 1: '', '', 1", function() {
     setTimeout(function(){
 	equal($('#result').text(), "a:empty b:empty ");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1: 1,'', ''", function() {    
@@ -54,7 +56,7 @@ asyncTest("判定 1: 1,'', ''", function() {
     setTimeout(function(){
 	equal($('#result').text(), "b:empty c:empty ");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:'', 1, ''", function() {    
@@ -65,7 +67,7 @@ asyncTest("判定 1:'', 1, ''", function() {
     setTimeout(function(){
 	equal($('#result').text(), "a:empty c:empty ");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:'', 1 1", function() {    
@@ -77,7 +79,7 @@ asyncTest("判定 1:'', 1 1", function() {
     setTimeout(function(){
 	equal($('#result').text(), "a:empty ");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:1 '' 1", function() {    
@@ -89,7 +91,7 @@ asyncTest("判定 1:1 '' 1", function() {
     setTimeout(function(){
 	equal($('#result').text(), "b:empty ");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:'' 1 1", function() {    
@@ -101,7 +103,7 @@ asyncTest("判定 1:'' 1 1", function() {
     setTimeout(function(){
 	equal($('#result').text(), "a:empty ");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:a 1 1: a:NG-INPUT", function() {    
@@ -114,7 +116,7 @@ asyncTest("判定 1:a 1 1: a:NG-INPUT", function() {
     setTimeout(function(){
 	equal($('#result').text(), "a:NG-INPUT ");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:1.1 1.2 1.3: NG-INPUT", function() {    
@@ -127,7 +129,7 @@ asyncTest("判定 1:1.1 1.2 1.3: NG-INPUT", function() {
     setTimeout(function(){
 	equal($('#result').text(), "a:NG-INPUT b:NG-INPUT c:NG-INPUT ");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:1 1 1: 正三角形", function() {    
@@ -140,7 +142,7 @@ asyncTest("判定 1:1 1 1: 正三角形", function() {
     setTimeout(function(){
 	equal($('#result').text(), "正三角形");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:100 100 100: 正三角形", function() {    
@@ -153,7 +155,7 @@ asyncTest("判定 1:100 100 100: 正三角形", function() {
     setTimeout(function(){
 	equal($('#result').text(), "正三角形");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:101 101 101: NG-INPUT", function() {    
@@ -166,7 +168,7 @@ asyncTest("判定 1:101 101 101: NG-INPUT", function() {
     setTimeout(function(){
 	equal($('#result').text(), "NG-INPUT");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:1 2 2: 二等辺三角形", function() {    
@@ -179,7 +181,7 @@ asyncTest("判定 1:1 2 2: 二等辺三角形", function() {
     setTimeout(function(){
 	equal($('#result').text(), "二等辺三角形");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:2 3 4: 一般の三角形", function() {    
@@ -192,7 +194,7 @@ asyncTest("判定 1:2 3 4: 一般の三角形", function() {
     setTimeout(function(){
 	equal($('#result').text(), "一般の三角形");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:3 4 5; 直角三角形", function() {    
@@ -205,7 +207,7 @@ asyncTest("判定 1:3 4 5; 直角三角形", function() {
     setTimeout(function(){
 	equal($('#result').text(), "直角三角形");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:0 1 2: 三角形が作れません", function() {    
@@ -218,7 +220,7 @@ asyncTest("判定 1:0 1 2: 三角形が作れません", function() {
     setTimeout(function(){
 	equal($('#result').text(), "三角形が作れません");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:1 2 3: 三角形が作れません", function() {    
@@ -231,7 +233,7 @@ asyncTest("判定 1:1 2 3: 三角形が作れません", function() {
     setTimeout(function(){
 	equal($('#result').text(), "三角形が作れません");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:100 99 98: 一般の三角形", function() {    
@@ -244,7 +246,7 @@ asyncTest("判定 1:100 99 98: 一般の三角形", function() {
     setTimeout(function(){
 	equal($('#result').text(), "一般の三角形");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 asyncTest("判定 1:30 40 50: 直角三角形", function() {    
@@ -257,7 +259,7 @@ asyncTest("判定 1:30 40 50: 直角三角形", function() {
     setTimeout(function(){
 	equal($('#result').text(), "直角三角形");
 	start();
-    }, wati_time);
+    }, wait_time);
 });
 
 

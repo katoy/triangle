@@ -59,6 +59,8 @@ eval_triangle = (req, res, kind) ->
   params = {'a': req.param('a'), 'b': req.param('b'), 'c':req.param('c') }
   parsed = my_parseInts params
 
+  callback = req.query.callback;
+
   for k, v of parsed
     err += "#{k}:#{v.message} " if typeof(v) == 'object'
 
@@ -74,7 +76,14 @@ eval_triangle = (req, res, kind) ->
   res.contentType('application/json');
   data = {method: kind, ans: ans, err: err, params: params}
   dataJSON = JSON.stringify(data)
-  res.send(dataJSON)
+
+  ans = ''
+  if callback
+    ans = callback + '(' + dataJSON + ')'
+  else
+    ans = dataJSON
+
+  res.send(ans)
 
 app.post '/triangle_0', (req, res) ->
   eval_triangle(req, res, 0)
