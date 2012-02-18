@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!-- テスト -->
+<html>
+ <head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  <title>QUnit Test Suite</title>
+  <!-- target js file -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="qunit/qunit.css" type="text/css" media="screen">
+  <script type="text/javascript" src="qunit/qunit.js"></script>
+  <script type="text/javascript" src="qunit-tap/qunit-tap.js"></script>
+
+  <script type="text/javascript" src="../../public/javascripts/myscript-ex.js"></script>
+  <script>
+    qunitTap(QUnit, function() { console.log.apply(console, arguments); }, {noPlan: true});
+  </script>
+  <!-- for testing file -->
+  <script type="text/javascript" src="js/myapp_test.js"></script>
+  <script type="text/javascript" src="../../public/test/test_0.js"></script>
+  <script type="text/javascript" src="../../public/test/test_1.js"></script>
+</head>
+<body>
+
+    <fieldset><h3>3辺の長さを指定してください。三角形の形状を判定します。</h3>
+      <p>[-100 ... 100] の範囲の整数を妥当な指定と見なします。 </p>
+      <form>
+        <div>
+          <div class="label">a:</div>
+          <input id="data_a" name="data_a" class="required hen"/>
+        </div>
+        <div>
+          <div class="label">b:</div>
+          <input id="data_b" name="data_b" class="required hen"/>
+        </div>
+        <div>
+          <div class="label">c:</div>
+          <input id="data_c" name="data_c" class="required hen"/>
+        </div>
+        <input id="my_submit_0" name="my_submit_0" type="button" value="判定0"/>
+        <input id="my_submit_1" name="my_submit_1" type="button" value="判定1"/>
+        <spawn>　</spawn><spawn id="result"></spawn>
+      </form>
+    </fieldset>
+
+  <h1 id="qunit-header">QUnit Test Suite</h1>
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+  <div id="qunit-fixture">test markup</div>
+</body>
+</html>
