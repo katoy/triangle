@@ -13,7 +13,7 @@ module("async test", {
             $("#data_b").val("");
             $("#data_c").val("");
 
-	    ok(true);
+	    // ok(true);
 	    start();
 	}, 100);
    },
@@ -21,7 +21,7 @@ module("async test", {
     teardown: function() {
 	stop();
 	setTimeout(function(){
-	    ok(true);
+	    // ok(true);
 	    start();
 	}, 100);
     }

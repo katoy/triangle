@@ -128,6 +128,13 @@ task "test-client", "test-client", ->
   console.log "   3. stop server ( ctrl-c)"
   console.log "------------------------------------"
 
+task "test-jsTestDriver", "jsTestDriver", ->
+  console.log "------------------------------------"
+  console.log "   1. run server ($ cake run)"
+  console.log "   2. cd test_test_jstestdriver"
+  console.log "   3. ./script/jstestdriver.sh"
+  console.log "------------------------------------"
+
 task "lint", "lint", ->
     run "coffee --lint *.coffee */*.coffee"
 
