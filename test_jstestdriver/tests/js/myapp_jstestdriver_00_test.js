@@ -24,7 +24,7 @@ MyAppTest00.prototype.test001 = function (queue) {
         $("#data_b").val("1");
         $("#data_c").val("1");
         $("#my_submit_0").click();
-        jstestdriver.console.log("------- click: " + $("#my_submit_0").click);
+        // jstestdriver.console.log("------- click: " + $("#my_submit_0").click);
     });
 
     queue.call('Step 2: schedule the window to increment our variable 5 seconds from now.', function(callbacks) {
@@ -37,7 +37,7 @@ MyAppTest00.prototype.test001 = function (queue) {
     queue.call('Step 3: then assert our state variable changed', function() {
         assertEquals(2, state);
         var result = $("#result").text();
-        jstestdriver.console.log("------- result: " + result );
+        // jstestdriver.console.log("------- result: " + result );
         assertEquals(result, "REGULAR");
     });
 

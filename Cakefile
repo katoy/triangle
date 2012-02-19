@@ -130,9 +130,16 @@ task "test-client", "test-client", ->
 
 task "test-jsTestDriver", "jsTestDriver", ->
   console.log "------------------------------------"
-  console.log "   1. run server ($ cake run)"
-  console.log "   2. cd test_test_jstestdriver"
+  console.log "   1. run server on prt 3000 ($ cake run)"
+  console.log "   2. cd test_jstestdriver"
   console.log "   3. ./script/jstestdriver.sh"
+  console.log "------------------------------------"
+
+task "test-phantomjs", "phantomjs", ->
+  console.log "------------------------------------"
+  console.log "   1. run server on prt 3000 ($ cake run)"
+  console.log "   2. cd test_jstestdriver"
+  console.log "   3. ./script/phantomjs_test.sh"
   console.log "------------------------------------"
 
 task "lint", "lint", ->

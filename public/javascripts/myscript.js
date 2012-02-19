@@ -24,7 +24,7 @@ $(function () {
         $.ajax({
             type: 'POST',
             url: '/triangle_0',
-            dataType: "jsonp",
+            dataType: "json",
             data: {a: $("#data_a").val(),
                    b: $("#data_b").val(),
                    c: $("#data_c").val()
@@ -54,7 +54,7 @@ $(function () {
         $.ajax({
             type: 'POST',
             url: '/triangle_1',            
-            dataType: "jsonp",
+            dataType: "json",
             data: {a: $("#data_a").val(),
                    b: $("#data_b").val(),
                    c: $("#data_c").val()

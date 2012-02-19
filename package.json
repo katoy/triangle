@@ -4,15 +4,15 @@
   , "private": true
   , "dependencies": {
       "coffee-script": ">=1.2.0"
-    , "express": ">=2.5.2"
-    , "jade": ">=0.20.0"
-    , "stylus": ">=0.22.6"
+    , "express": ">=2.5.8"
+    , "jade": ">=0.20.3"
+    , "stylus": ">=0.24.0"
 
     , "vows": ">=0.6.1"
-    , "zombie": ">=0.12.13"
+    , "zombie": ">=0.12.14"
   }
   , "engines" : { 
-       "node" : ">=0.6.7"
+       "node" : ">=0.6.11"
   }
  , "scripts": {
     "test": "cake test"
