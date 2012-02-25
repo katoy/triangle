@@ -86,6 +86,9 @@ task 'clean', 'Clean compiled *.js *~', ->
     util.log "\t#{file}"
     run "rm #{file}"
 
+  run "rm -f test_jstestdriver/report/*"
+  run "rm -fr  test_jstestdriver/html/*"
+
 # cake -e "development"
 option '-e', '--environment [ENVIRONMENT_NAME]', 'set the environment for `task:run` (production|development, default=development)'
 option '-p', '--port [ENVIRONMENT_NAME]', 'set the port for `task:run` (default=3000)'

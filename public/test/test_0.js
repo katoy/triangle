@@ -16,7 +16,7 @@ module("async test", {
 	    // ok(true);
 	    start();
 	}, 100);
-   },
+    },
 
     teardown: function() {
 	stop();

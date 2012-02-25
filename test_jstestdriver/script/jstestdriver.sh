@@ -10,7 +10,7 @@ FIREFOX=script/firefox
 CHROME=script/chrome
 OPERA=script/opera
 
-FULL=1
+FULL=0
 if [ $FULL = 0 ];then
     BROWSERS=${CHROME}
 else
@@ -23,7 +23,10 @@ fi
     --browser  ${BROWSERS} \
     --tests all \
     --verbose \
-    --captureConsole
+    --captureConsole \
+    --testOutput report
     )
 
+
+echo "After test, do 'genhtml -o html report/jsTestDriver.conf-coverage.dat'"
 

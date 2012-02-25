@@ -95,7 +95,7 @@ app.post '/triangle_1', (req, res) ->
   eval_triangle(req, res, 1)
 
 app.get '/triangle_1', (req, res) ->
-  eval_triangle(req, res, 0)
+  eval_triangle(req, res, 1)
 
 # port = argv[0] || process.env.PORT || 3000
 # app.listen port
