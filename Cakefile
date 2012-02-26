@@ -97,29 +97,29 @@ task 'run', "run application", (options) ->
   options.port or= 3000
   run "NODE_ENV=#{options.environment} coffee server.coffee #{options.port}"
 
-task "setup", "setup node-modules",  ->
+task "setup", "setup node-modules", ->
   run "npm install"
 
 task "spec", "spec", ->
   # run "jasmine-node spec --coffee spec"
-  runSync "rm -f coverage.html", () ->
-    runSync "vows spec/*_spec.coffee --spec --cover-html -v", () ->
+  runSync "rm -f coverage.html", ->
+    runSync "vows spec/*_spec.coffee --spec --cover-html -v", ->
       run "cp -f coverage.html public/coverage_spec.html"
 
 task "test", "test and overage", ->
   console.log "------------------------------------"
   console.log "   After finished, See ./coverage.html for coverage."
   console.log "------------------------------------"
-  runSync "rm -f coverage.html", () ->
-    runSync "vows test/triangle_test*.coffee --spec --cover-html", () ->
+  runSync "rm -f coverage.html", ->
+    runSync "vows test/triangle_test*.coffee --spec --cover-html", ->
       run "cp -f coverage.html public/coverage_test.html"
 
 task "inst", "inst", ->
-  runSync "rm -fr #{SRC_INST_DIR}", () ->
+  runSync "rm -fr #{SRC_INST_DIR}", ->
     run "mkdir #{SRC_INST_DIR}"
 
-  runSync "cake compile", () ->
-    runSync "jscoverage #{SRC_DIR} #{SRC_INST_DIR}", () ->
+  runSync "cake compile", ->
+    runSync "jscoverage #{SRC_DIR} #{SRC_INST_DIR}", ->
       run "mv #{SRC_INST_DIR}/*.js #{SRC_DIR}"
 
 task "test-client", "test-client", ->
@@ -148,3 +148,8 @@ task "test-phantomjs", "phantomjs", ->
 task "lint", "lint", ->
     run "coffee --lint *.coffee */*.coffee"
 
+task "make-docs", "make docs/*.html, *.epub", ->
+    run "cd docs; ./makedoc.sh"
+
+task "clean-docs", "clean gnerated docs/*", ->
+    run "cd docs; ./cleandoc.sh"

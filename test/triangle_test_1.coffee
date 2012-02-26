@@ -158,6 +158,6 @@ vows.describe("test for triangle")
     topic: () ->
       new_browser().visit baseUrl + "/triangle_1?a=1&b=1&c=1", @callback
     'get [1 1 1]':  (browser) ->
-      assert.equal(browser.html(), '{"method":0,"ans":"REGULAR","err":"","params":{"a":"1","b":"1","c":"1"}}')
+      assert.equal(browser.html(), '{"method":1,"ans":"REGULAR","err":"","params":{"a":"1","b":"1","c":"1"}}')
 
 .export module
