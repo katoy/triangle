@@ -10,12 +10,20 @@ FIREFOX=script/firefox
 CHROME=script/chrome
 OPERA=script/opera
 
-FULL=0
-if [ $FULL = 0 ];then
-    BROWSERS=${CHROME}
+if [ $# = 0 ];then
+  echo "usage)  jstestdriver.sh [1|0]"
+  echo "         0: run chrome"
+  echo "         1: run safari, firefox, chrome, opera"
+  exit
 else
-    BROWSERS=${SAFARI},${FIREFOX},${CHROME},${OPERA}
+  if [ $1 = 0 ];then
+      BROWSERS=${CHROME}
+  else
+      BROWSERS=${SAFARI},${FIREFOX},${CHROME},${OPERA}
+  fi
 fi
+echo "--------  running -------"
+echo $BROWSERS
 
 (java -jar ${JSTESTDRIVER_BIN} \
     --port 4224 \

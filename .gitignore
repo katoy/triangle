@@ -10,4 +10,8 @@ vendor
 src-inst/
 coverage*.html
 public/coverage*.html
+selenium_2/*.png
 *.log
+*/*.log
+test_jstestdriver/report
+docs_x/

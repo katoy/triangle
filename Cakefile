@@ -145,6 +145,22 @@ task "test-phantomjs", "phantomjs", ->
   console.log "   3. ./script/phantomjs_test.sh"
   console.log "------------------------------------"
 
+task "test-selenium_1", "selenium_1", ->
+  console.log "------------------------------------"
+  console.log "   1. run server on prt 3000 ($ cake run)"
+  console.log "   2. acccss http://localhost:3000 using firefox"
+  console.log "   3. Use Selenium IDE, load selenium_1/sample and play"
+  console.log "------------------------------------"
+
+task "test-selenium_2", "selenium_2", ->
+  console.log "------------------------------------"
+  console.log "   1. run server on prt 3000 ($ cake run)"
+  console.log "   2. cd selenium_2"
+  console.log "   2. java -jar selenium-server-standalone-2.20.0.jar"
+  console.log "   3. ruby test01.rb"
+  console.log "   4. coffee test01.coffee"
+  console.log "------------------------------------"
+
 task "lint", "lint", ->
     run "coffee --lint *.coffee */*.coffee"
 
