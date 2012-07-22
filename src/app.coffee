@@ -47,7 +47,7 @@ my_parseInts = (vals) ->
       if m == null
         res =  Error('NG-INPUT')
       else
-        res = parseInt(v)
+        res = parseInt(v, 10)
     parsed[k] = res
 
   parsed
@@ -59,13 +59,13 @@ eval_triangle = (req, res, kind) ->
   params = {'a': req.param('a'), 'b': req.param('b'), 'c':req.param('c') }
   parsed = my_parseInts params
 
-  callback = req.query.callback;
+  callback = req.query.callback
 
   for k, v of parsed
     err += "#{k}:#{v.message} " if typeof(v) == 'object'
 
   if err == ''
-    tr = null;
+    tr = null
     tr = new triangle_bad() if kind == 0
     tr = new triangle() if kind == 1
     try
@@ -73,7 +73,7 @@ eval_triangle = (req, res, kind) ->
     catch ex
       err = "#{ex}"
 
-  res.contentType('application/json');
+  res.contentType('application/json')
   data = {method: kind, ans: ans, err: err, params: params}
   dataJSON = JSON.stringify(data)
 
@@ -103,4 +103,3 @@ app.get '/triangle_1', (req, res) ->
 module.exports.start = (port) ->
   app.listen port
   console.log "Express server listening on port #{port} in #{app.settings.env} mode"
-

@@ -35,7 +35,7 @@ vows.describe('Triangle_bad:正数と０')
     topic: () ->
       @triangle = new Triangle_bad()
 
-    '直角三角形, その他' : (err, browser, status) ->
+    '直角三角形, その他 1' : (err, browser, status) ->
       for [a, b, c, kind] in Triangle_cases.cases_result_misc_0
         # a,b,c の順番に kind() が依存していないことをチェックする
         assert.equal("1 #{a},#{b},#{c}:#{@triangle.kind(a, b, c)}", "1 #{a},#{b},#{c}:#{kind}")
@@ -45,7 +45,7 @@ vows.describe('Triangle_bad:正数と０')
         assert.equal("5 #{a},#{b},#{c}:#{@triangle.kind(c, a, b)}", "5 #{a},#{b},#{c}:#{kind}")
         assert.equal("6 #{a},#{b},#{c}:#{@triangle.kind(c, b, a)}", "6 #{a},#{b},#{c}:#{kind}")
 
-    '直角三角形, その他' : (err, browser, status) ->
+    '直角三角形, その他 2' : (err, browser, status) ->
       for [a, b, c, kind] in Triangle_cases.cases_result_misc_1
         # a,b,c の順番に kind() が依存していないことをチェックする
         assert.equal("1 #{a},#{b},#{c}:#{@triangle.kind(a, b, c)}", "1 #{a},#{b},#{c}:#{kind}")

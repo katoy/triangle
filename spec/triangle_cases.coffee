@@ -8,8 +8,6 @@ class Triangle_cases
   @cases_result_555 :  {
     '0,0,0': 'NG'
     , '0,0,1': 'NG'
-    , '0,0,0': 'NG'
-    , '0,0,1': 'NG'
     , '0,0,2': 'NG'
     , '0,0,3': 'NG'
     , '0,0,4': 'NG'

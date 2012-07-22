@@ -21,7 +21,10 @@ USAGE
 
     $ cake run
     then access http://localhost:3000
-    
+
+   (OPTION)  need pandoc ( See http://johnmacfarlane.net/pandoc/installing.html )
+   $ cake make-docs
+
 Description
 ============
 

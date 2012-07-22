@@ -3,7 +3,6 @@
 fs = require 'fs'
 util = require 'util'
 
-
 SRC_DIR = 'src'
 SRC_INST_DIR = 'src-inst'
 SPEC_DIR = 'spec'
@@ -88,6 +87,7 @@ task 'clean', 'Clean compiled *.js *~', ->
 
   run "rm -f test_jstestdriver/report/*"
   run "rm -fr  test_jstestdriver/html/*"
+  run "rm -fr #{SRC_INST_DIR}"
 
 # cake -e "development"
 option '-e', '--environment [ENVIRONMENT_NAME]', 'set the environment for `task:run` (production|development, default=development)'
@@ -100,19 +100,23 @@ task 'run', "run application", (options) ->
 task "setup", "setup node-modules", ->
   run "npm install"
 
-task "spec", "spec", ->
+task "spec", "spec and coverage", ->
   # run "jasmine-node spec --coffee spec"
   runSync "rm -f coverage.html", ->
     runSync "vows spec/*_spec.coffee --spec --cover-html -v", ->
       run "cp -f coverage.html public/coverage_spec.html"
+      console.log "------------------------------------"
+      console.log "   Triangle_bad は３つのテストが error になります。"
+      console.log "   After finished, See ./coverage.html for coverage."
+      console.log "------------------------------------"
 
-task "test", "test and overage", ->
-  console.log "------------------------------------"
-  console.log "   After finished, See ./coverage.html for coverage."
-  console.log "------------------------------------"
+task "test", "test and coverage", ->
   runSync "rm -f coverage.html", ->
     runSync "vows test/triangle_test*.coffee --spec --cover-html", ->
       run "cp -f coverage.html public/coverage_test.html"
+      console.log "------------------------------------"
+      console.log "   After finished, See ./coverage.html for coverage."
+      console.log "------------------------------------"
 
 task "inst", "inst", ->
   runSync "rm -fr #{SRC_INST_DIR}", ->

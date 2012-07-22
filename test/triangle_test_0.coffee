@@ -157,13 +157,6 @@ vows.describe("test for triangle_bad")
   "check get_method":
     topic: () ->
       new_browser().visit baseUrl + "/triangle_0?a=1&b=1&c=1", @callback
-    'get [1 1 1]':
-      topic: (browser) ->
-        assert.equal(browser.html(), "")
-
-  "check get_method":
-    topic: () ->
-      new_browser().visit baseUrl + "/triangle_0?a=1&b=1&c=1", @callback
     'get [1 1 1]':  (browser) ->
       assert.equal(browser.html(), '{"method":0,"ans":"REGULAR","err":"","params":{"a":"1","b":"1","c":"1"}}')
 
