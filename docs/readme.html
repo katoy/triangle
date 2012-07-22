@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="加藤洋一">
+  <meta name="author" content="youichikato@gmail.com">
+  <title>javascript の自動テスト環境構築例</title>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <style type="text/css">
+    q { quotes: "“" "”" "‘" "’"; }
+  </style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; background-color: #2a211c; color: #bdae9d; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; background-color: #2a211c; color: #bdae9d; border-right: 1px solid #bdae9d; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #bdae9d; background-color: #2a211c; }
+code > span.kw { color: #43a8ed; font-weight: bold; }
+code > span.dt { text-decoration: underline; }
+code > span.dv { color: #44aa43; }
+code > span.bn { color: #44aa43; }
+code > span.fl { color: #44aa43; }
+code > span.ch { color: #049b0a; }
+code > span.st { color: #049b0a; }
+code > span.co { color: #0066ff; font-style: italic; }
+code > span.al { color: #ffff00; }
+code > span.fu { color: #ff9358; font-weight: bold; }
+code > span.er { font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="html.css">
+</head>
+<body>
+<header>
+<h1 class="title">javascript の自動テスト環境構築例</h1>
+<h2 class="author">加藤洋一</h2>
+<h2 class="author">youichikato@gmail.com</h2>
+<h3 class="date">© 2012</h3>
+</header>
+<h4>
+2012-02-19 加藤洋一 加筆・校正<br/> 2012-02-27 加藤洋一 作成開始<br/>
+</h4>
+<h1 id="目的">目的</h1>
+<p>web アプリ、web サービスの自動テスト環境の構築例を示す。<br>手動テストの改善の検討資料とする。</p>
+<div style="margin-left:50px; width: 600px;border-style:solid;">
+<p>　　　　　　<strong>＜＜目次＞＞</strong><br>　<a href="#自動化の効果概要">自動化の効果概要</a><br>　　　<a href="#成果物の比較">成果物の比較</a><br>　　　<a href="#自動テストの利点">自動テストの利点</a><br>　　　<a href="#自動テストの不利な点">自動テストの不利な点</a><br>　<a href="#品管のテスト自動化推進の進め方への提案">品管のテスト自動化推進の進め方への提案</a><br>　　　<a href="#プロセス改善の進め方">プロセス改善の進め方</a><br>　<a href="#自動テストの環境構築/手法例">自動テストの環境構築/手法例</a><br>　　　<a href="#テスト対象のアプリーケーション">テスト対象のアプリーケーション</a><br>　　　<a href="#テスト内容">テスト内容</a><br>　　　<a href="#サーバーサイド上でのテスト">サーバーサイド上でのテスト</a><br>　　　　　<a href="#cake%20spec">cake spec</a><br>　　　<a href="#クライアントからのテスト">クライアントからのテスト</a><br>　　　　<a href="#cake%20test">cake test</a><br>　　　　　<a href="#qunit%20を使う">qunit を使う</a><br>　　　　　　　<a href="#実ブラウザ上で実行">実ブラウザ上で実行</a><br>　　　　　　　　　<a href="#cake%20test-client">cake test-client</a><br>　　　　　　　<a href="#擬似ブラウザ上で実行">擬似ブラウザ上で実行</a><br>　　　　　　　　　<a href="#cake%20test-client-phantimjs">cake test-client-phantimjs</a><br>　　　　　<a href="#cake%20test-phantomjs">cake test-phantomjs</a><br>　　　　　<a href="#cake%20test-jsTestDriver">cake test-jsTestDriver</a><br>　　　　　<a href="#Selenium%20の利用">Selenium の利用</a><br>　　　　　　　　　<a href="#cake%20test-selenium_1">cake test-selenium_1</a><br>　　　　　　　　　<a href="#cake%20test-selenium_1">cake test-selenium_2</a><br>　　　　<a href="#テスト実行方法">テスト実行方法</a><br>　<a href="#参考">参考</a></p>
+</div>
+
+<a name="自動化の効果概要" />
+<h1 id="自動化の効果概要">自動化の効果概要</h1>
+<a name="成果物の比較" />
+<h2 id="成果物の比較">成果物の比較</h2>
+<p>　　　　現状：<br>　　　　　　仕様書、プログラム、開発内テスト(チェックシートとテスト結果)<br>　　　　　　品管のテスト (チェックシートとテスト結果)</p>
+<p>　　　　自動テストを導入した場合：<br>　　　　　　仕様書、プログラム、開発内テスト(チェック仕様書、<strong>テストプログラム</strong>、<strong>テスト実施ログ</strong> )<br>　　　　　　品管のテスト (チェックシートとテスト結果)<br>　　　　　　　(品管が作成した自動テストは開発内テストに全て取り込まれていく。<br>　　　　　　　 品管のテストは、最終的には手動テストのものだけとなる。)<br>　　　　　　　 今回のアプリの例では、様々な値に対する判定結果のテストは全て自動化される。<br>　　　　　　　 手動テストでは、画面の様々なエフェクト を扱うものだけとなるだろう。<br>　　　　　　　 (入力フォームのウォーターマークの様子、画面レイアウト、画面改造像の差の影響,<br>　　　　　　　　キー・マウス操作, IME 操作 etc…)</p>
+<a name="自動テストの利点" />
+<h2 id="自動テストの利点">自動テストの利点</h2>
+<p>　　　　1. 全ての版に全テストを実施できる。<br>　　　　2. 誰もが何時でもテストを実施できる。さらにチェック結果の判断ミスが発生しない。<br>　　　　　　現状では、テスト結果(チェックシートのテスト結果) を第３者が再チェックすることは困難。<br>　　　　　　(テスト環境を構築した上で、さらに同等の時間を費やせねばならない為)<br>　　　　3. テストに掛かった時間を正確に計測できる。<br>　　　　　　(テストを繰り返す際に、正確な時間見積もりが可能となる。)<br>　　　　　　現状では１パス実行に何時間かかったかが記録されていない。<br>　　　　　　１パスを全て実行するのに必要な工数を第三者が正確に見積れない。<br>　　　　4. 効率がアップする。<br>　　　　　　効率アップ率: 　 2900 / 770 = <strong>3.76 倍</strong><br>　　　　　　自動チェックでは実質時間は、テスト結果のチェック時間 10 秒 + 10 回 = 100 秒程度となる。<br>　　　　　　その数値で計算した場合は、<br>　　　　　　　　　 2900 / 100= <strong>29倍</strong><br>　　　　　　となる。<br>　　　　5. テストカバレッジという指標で、テストプログラム自体を評価することができる。<br>　　　　　　　現状のチェックシート + 手動テストでは、網羅性を客観的に判断できない。<br>　　　　6. 品管のテスト項目の観点を、<br>　　　　　　　　機能チェック　⇒ ユーザー観点チェク<br>　　　　　 にシフトさせることができる。<br>　　　　　 現状で単体テストレベルのことのテストに費やしていた時間を、<br>　　　　　 全体のデザインの統一、ユーザービリティなどの観点のチェックに回すことができる。<br>　　　　7. デグレードを恐れて 改善・変更を見送ること が少なくなる。<br>　　　　　　　（基本動作に副作用が生じていないかを、漏れなく短時間で何度でもチェックが可能になるので）</p>
+<div style="margin-left:50px;">
+<h4 id="効率アップ率の試算例">効率アップ率の試算例</h4>
+<p>web アプリに、リリースまでに１０回 のプログラム変更が行われたとする。<br>その場合の各版でのテスト実施時間、テストに費やす時間を表にしてみた。</p>
+<table>
+<col style="width: 15%" /><col style="width: 32%" /><col style="width: 29%" /><col style="width: 22%" /><thead>
+<tr class="header">
+<th style="text-align: right;">version</th>
+<th style="text-align: center;">現状の方法</th>
+<th style="text-align: left;">自動テスト環境</th>
+<th style="text-align: left;">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.1</td>
+<td style="text-align: center;">400 秒 (40 項目 * 10 秒)</td>
+<td style="text-align: left;">40 秒 (40 項目 * 1 秒)</td>
+<td style="text-align: left;">初期のテスト設計</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.2</td>
+<td style="text-align: center;">100 秒 (10 項目 * 10 秒)</td>
+<td style="text-align: left;">50 秒 (50 項目 * 1 秒)</td>
+<td style="text-align: left;">テスト追加 10 件</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.3</td>
+<td style="text-align: center;">100 秒 (10 項目 * 10 秒)</td>
+<td style="text-align: left;">60 秒 (60 項目 * 1 秒)</td>
+<td style="text-align: left;">テスト追加 10 件</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.4</td>
+<td style="text-align: center;">100 秒 (10 項目 * 10 秒)</td>
+<td style="text-align: left;">70 秒 (70 項目 * 1 秒)</td>
+<td style="text-align: left;">テスト追加 10 件</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.5</td>
+<td style="text-align: center;">100 秒 (10 項目 * 10 秒)</td>
+<td style="text-align: left;">80 秒 (80 項目 * 1 秒)</td>
+<td style="text-align: left;">テスト追加 10 件</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.6</td>
+<td style="text-align: center;">800 秒 (80 項目 * 10 秒)</td>
+<td style="text-align: left;">80 秒 (80 項目 * 1 秒)</td>
+<td style="text-align: left;"><strong>全テストの実施</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.7</td>
+<td style="text-align: center;">100 秒 (10 項目 * 10 秒)</td>
+<td style="text-align: left;">90 秒 (80 項目 * 1 秒)</td>
+<td style="text-align: left;">テスト追加 10 件</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.8</td>
+<td style="text-align: center;">100 秒 (10 項目 * 10 秒)</td>
+<td style="text-align: left;">100 秒 (100 項目 * 1 秒)</td>
+<td style="text-align: left;">テスト追加 10 件</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.9</td>
+<td style="text-align: center;">1000 秒 (100 項目 * 10 秒)</td>
+<td style="text-align: left;">100 秒 (100 項目 * 1 秒)</td>
+<td style="text-align: left;"><strong>全テスト実施</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1.0</td>
+<td style="text-align: center;">100 秒 (10 項目 * 10 秒)</td>
+<td style="text-align: left;">100 秒 (100 項目 * 1 秒)</td>
+<td style="text-align: left;"><strong>抜出しテスト 10件</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><strong>Total</strong></td>
+<td style="text-align: center;"><strong>2900 秒 (290 項目 * 10 秒)</strong></td>
+<td style="text-align: left;"><strong>770 秒(770 項目 * 1 秒)</strong></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+　　＊　現状では、 出荷する 1.0 版に対して、全テスト確認はしていない。<br>　　＊　現状では、途中の版でのデグレードが次版で見つからないケースがある。（全テストの実施をしていない為）<br>　　＊　自動テストでは、テスト実施中に他の作業をすることができる。<br>　　　　　(テスト失敗のアラームを注意しているだけでよい)<br>
+</div>
+
+<a name="自動テストの不利な点" />
+<h2 id="自動テストの不利な点">自動テストの不利な点</h2>
+<p>　　　 1. テストの自動化率 100 % は非常に困難。(テスト項目頃に自動化するか否かを判断すべき)<br>　　　 2. テスト内容は逐次 本体プログラムの変更に追従していく必要がある。</p>
+<a name="品管のテスト自動化推進の進め方への提案" />
+<h2 id="テスト自動化推進の進め方への提案">テスト自動化推進の進め方への提案</h2>
+<h3 id="デザインゴール">デザインゴール</h3>
+<ol type="1">
+<li><p>ＡＰＩの単体テストは極力 自動化をする。（サーバー、クライアント共に）<br>　リリースの度に、自動テストは全件を実施し、 テストケースの範疇ではデグレードしていないことを保証する。</p></li>
+<li><p>ロジックコードは サーバー上で十分な coverage をもった自動・手動テストを行う。（サーバー、クライアント共に）</p></li>
+<li><p>クライアントの ＵＩコードは、無理に自動化はしない。<br> ただし、基本的なユーザーストーリーは、極力 自動化する。</p></li>
+</ol>
+<a name="プロセス改善の進め方" />
+<h2 id="プロセス改善の進め方">プロセス改善の進め方</h2>
+<div style="margin:0 auto 0 auto; width: 90%;">
+  
+<a href="images/steps.png"><img src="images/steps.png" width="80%" height="80%" style="border-style:solid;"></img></a>
+</div>
+
+<h3 id="ステップ-1">ステップ 1</h3>
+<p>　サーバーの API 単体テストを開発と品管で分担して作成する。(テストコードはソースコードレポジトリーに登録する)<br>　クライアントからの呼び出し部分は　100％ カバーする。<br>　仕様変更には直ちに対応し、日々の build、開発外への リリース前には全件が PASS OK である状態を保つ。<br>　(自動テストを作成しやすい設計、実装をするようにする。<br>　 重要な HTML 湯嘘には id をつけて、テストプログラムから参照しやすくする 等)</p>
+<p>　呼び出しパラメータの網羅性、境界値付近のケースを十分に行う。<br>　カバレッジ計測、速度も計測をして結果を保存する。</p>
+<p>　SQR 検査では、なるだけ自動テストへテストケースを追加と、そのテストが OK であることをチェックするようにする。<br>　　(自動テストに追加することで、この SQR の問題が将来の版で再発した場合に直ちに発見できる)</p>
+<h3 id="ステップ-2">ステップ 2</h3>
+<p>　クライアントのAPIの単体テストを開発と品管で分担して作成する。(テストコードはソースコードレポジトリーに登録する)<br>　サーバー呼び出し部分は 100% カバーする。</p>
+<h3 id="ステップ-3">ステップ 3</h3>
+<p>　ユーザーストーリーを <a href="http://seleniumhq.org/" title="Selenium">Selenium</a>2 or <a href="http://code.google.com/p/js-test-driver/" title="jsTestDriver">jsTestDriver</a> で自動テスト化する。<br>　複数種類のブラウザに渡っても、自動テストできるようにする。<br>　　 (Selenium２，jsTestDriver では複数ブラウザでのテストが可能な機能を持っている）</p>
+<h3 id="ステップ-4">ステップ 4</h3>
+<p>　GUI の一部を自動テスト化する。</p>
+<a name="自動テストの環境構築/手法例" />
+<h1 id="自動テストの環境構築手法例">自動テストの環境構築/手法例</h1>
+<a name="テスト対象のアプリーケーション" />
+<h2 id="テスト対象のアプリーケーション">テスト対象のアプリーケーション</h2>
+<h3 id="web-アプリ">Web アプリ：</h3>
+<div style="margin:0 auto 0 auto; width: 60%;">
+<a href='images/web-app-001.png' target='_blank'><img src='images/web-app-001.png' width='70%' height='70%' alt=''/></a> <br/> <a href='movies/2012-03-11_1551-app.swf' target='_blank'>動画</a>
+</div>
+
+<p>機能概要：<br>　web 画面の Form に３つの整数 [0..100] を入れると、<br>　　その数字を辺の長さとして三角形をつくると　どのような形状になるか？<br>　を画面に表示する。</p>
+<p>　3 つの数字が入力されていなければ、<br>　　　その旨をエラー<br>　　　　　<q>入力されていない</q>、<q>数値が指定されていない</q> etc…<br>　3 つの数字が入力されていれば、判定結果として<br>　　　直角三角形<br>　　　２等辺三角形<br>　　　一般の三角形<br>　　　三角形を構成できない<br>　を表示する。</p>
+<p>　web 画面は HTML5 で記載されている。<br>　html form として３つの数値入力エリア、判定実行ボタンを配置する。<br>　判定実行ボタンをクリックすると、ajax 呼び出し (非同期) でサーバーに３つの値を渡す。<br>　サーバーは３つの数字からの判定結果を返す。<br>　クライアント側はサーバーから返ってきた判定結果を画面に表示する。</p>
+<a name="テスト内容" />
+<h2 id="テスト内容">テスト内容</h2>
+<div style="margin:0 auto 0 auto; width: 90%;">
+<a href='images/arch.png'><img src='images/arch.png' width="90%" height="90%" style="border-style:solid;" alt='arch.png'/></a>
+</div>
+
+<p>今回は 8 つのテスト方式を試した。<br>　　1. サーバーサイド上でのテスト<br>　　　　関数を様々な引数で直接呼び出して、返り値をチェックする。(<strong>cake spec</strong>)</p>
+<p>　　2.クライアントからのテスト<br>　　　　2.1 <a href="http://vowsjs.org/" title="vows">vows</a> + [phantomjs]] を使ってテストする。(cake test)</p>
+<p>　　　　2.2 <a href="http://docs.jquery.com/QUnit/" title="qunit">qunit</a> を使ってテストする。<br>　　　　　　　 2.1.1. 実際のブラウザ上から使う。(cake test-client)<br>　　　　　　　 2.1.2. 擬似ブラウザ上から使う。(cake test-client)</p>
+<p>　　　　2.3 擬似ブラウザを使って、ロボット操作する。(cake test-phantomjs)<br>　　　　　　入力フォーム経様々な値を設定・実行をし、<br>　　　　　　画面の結果部分の文字列をチェックする。</p>
+<p>　　　　2.4 実際のブラウザを使って、javascript をテストする。(<strong>cake test-jsTestDriver</strong>)<br>　　　　2.5 実際のブラウザを使って、ロボット操作してテストする。(cake test-selenium_1, <strong>cake test-selenium_2</strong>)</p>
+<p>　　プログラムのリリース時には、<br>　　　　仕様書、プログラム と共にテストプログラム・結果もあわせて提供されるべきである。<br>　　　　(仕様書の変更に合わせて、テストプログラムが変更され、<br>　　　　 プログラム本体がそのテストを PASS していることは、開発側で確認済みであることが望ましい)</p>
+<a name="サーバーサイド上でのテスト" />
+<h2 id="サーバーサイド上でのテスト">1. サーバーサイド上でのテスト</h2>
+<p>サーバーサイドでは、ajax の処理先として<br>　　　triangle.kind(a, b ,c)<br>という javascritp の関数がある。<br>　　(入力： a,b,c: 3 つの文字列,<br>　　 返り値：<br>　　　　　　<q>REGULAR</q>: 一般の三角形, <q>ISO</q>: 二等辺三角形, <q>RIGHT</q>: 直角三角形<br>　　　　　　<q>NG</q>: 三角形を構成できない。<br>　　　　　　<q>NG-INPUT</q>: 入力文字列が不正</p>
+<p>この kind() を様々な引数で呼び出して、その返り値をテストする。</p>
+<a name="cake spec" />
+<h3 id="cake-spec">1.1 cake spec</h3>
+<p><a href="http://vowsjs.org/">vows</a> を利用して、単体テストを行う。<br>javascript で直接 kind() を呼び出してテストする。</p>
+<p>コンソール画面で、１コマンド実行 (１行目) するだけで、テスト結果 (181 行目) が得られる。<br>処理時間は 1.3 秒である。</p>
+<div style="margin:0 auto 0 auto; width:70%">
+<a href='movies/2012-03-11_0023-spec-test.swf'>動画 (2012-03-11_0023-spec-test.swf)</a>　18 秒まで
+</div>
+
+
+<table class="sourceCode bash numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+</pre></td><td class="sourceCode"><pre><code class="sourceCode bash">$ cake spec
+cake spec
+vows runner loading<span class="kw"> [</span> <span class="st">&#39;/Users/youichikato/github/triangle/spec/triangle-bad_spec&#39;</span>, <span class="st">&#39;/Users/youichikato/github/triangle/spec/triangle_spec&#39;</span><span class="kw"> ]</span>
+vows runner running Triangle_bad:正数と０ 
+♢ Triangle_bad:正数と０
+
+  正数と０
+    ✓ [0..4]  [0..4]  [0..4]
+  直角三角形, その他
+    ✗ 直角三角形, その他
+    overflow! a^2 = 25, b^2 = 144, c^2 = 169, a^2 + b^2 = 169
+  最大・最小の整数
+    ✓ 最小の整数
+    ✓ 最大の整数
+  最大 - 1
+    ✗ x
+    overflow! a + b = 199, b + c = 200, c + a = 199
+
+
+vows runner running Triangle:正数と０ 
+♢ Triangle:正数と０
+
+  正数と０
+    ✓ [0..4]  [0..4]  [0..4]
+  正数と０ 直角三角形, その他
+    ✓ 直角三角形, その他
+  正数と０ 最大・最小の整数
+    ✓ 最小の整数
+    ✓ 最大の整数
+  正数と０ Triangle:最大 - 1
+    ✓ x
+
+
+vows runner finish 
+✗ Errored » 8 honored ∙ 2 errored <span class="kw">(</span>0.006s<span class="kw">)</span>
+
+real    0m1.305s
+user    0m0.601s
+sys 0m0.125s</code></pre></td></tr></table>
+<div style="margin:20px auto 0 auto; width: 60%;">
+　　　　　＊コードカバレージ計測結果＊ <a href='images/coverage-report-001.png' target='_blank'><img src='images/coverage-report-001.png' width="80%" height="80%" alt=''/></a>
+</div>
+
+<p>ここでは 2つの javascript ファイルに 自動テストの内容を記載している。<br>それぞれ 5 x 5 x 5 + 3 + 29 = 157 ケースのテストをおこなっている。</p>
+<p>　　　　1. <a href="../spec/triangle_cases.coffee">spec/triangle_cases.coffee</a><br/> 　　　　2. <a href="../spec/triangle_cases.coffee">spec/triangle_spec.coffee</a></p>
+<ol type="1">
+<li><a href="../spec/triangle_cases.coffee">spec/triangle_cases.coffee</a> の内容</li>
+</ol>
+<table class="sourceCode coffeescript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+</pre></td><td class="sourceCode"><pre><code class="sourceCode coffeescript"><span class="kw">class</span> <span class="dt">Triangle_cases</span>
+  <span class="co"># [0..4] x [0..4] x [0..4] の網羅テスト</span>
+  <span class="dt">@cases_result_555</span> <span class="kw">:</span>  <span class="kw">{</span>
+    <span class="st">&#39;0,0,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,0,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,0,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,0,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,0,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,1,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,1,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,1,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,1,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,1,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,2,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,2,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,2,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,2,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,2,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,3,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,3,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,3,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,3,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,3,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,4,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,4,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,4,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,4,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;0,4,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+
+    <span class="kw">,</span> <span class="st">&#39;1,0,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,0,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,0,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,0,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,0,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,1,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,1,1&#39;</span><span class="kw">:</span> <span class="st">&#39;REGULAR&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,1,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,1,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,1,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,2,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,2,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,2,2&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,2,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,2,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,3,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,3,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,3,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,3,3&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,3,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,4,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,4,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,4,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,4,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;1,4,4&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,0,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,0,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,0,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,0,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,0,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,1,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,1,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,1,2&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,1,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,1,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,2,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,2,1&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,2,2&#39;</span><span class="kw">:</span> <span class="st">&#39;REGULAR&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,2,3&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,2,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,3,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,3,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,3,2&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,3,3&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,3,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NORMAL&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,4,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,4,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,4,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,4,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NORMAL&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;2,4,4&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,0,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,0,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,0,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,0,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,0,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,1,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,1,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,1,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,1,3&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,1,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,2,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,2,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,2,2&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,2,3&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,2,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NORMAL&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,3,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,3,1&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,3,2&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,3,3&#39;</span><span class="kw">:</span> <span class="st">&#39;REGULAR&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,3,4&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,4,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,4,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,4,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NORMAL&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,4,3&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;3,4,4&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,0,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,0,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,0,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,0,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,0,4&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,1,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,1,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,1,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,1,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,1,4&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,2,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,2,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,2,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,2,3&#39;</span><span class="kw">:</span> <span class="st">&#39;NORMAL&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,2,4&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,3,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,3,1&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,3,2&#39;</span><span class="kw">:</span> <span class="st">&#39;NORMAL&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,3,3&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,3,4&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,4,0&#39;</span><span class="kw">:</span> <span class="st">&#39;NG&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,4,1&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,4,2&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,4,3&#39;</span><span class="kw">:</span> <span class="st">&#39;ISO&#39;</span>
+    <span class="kw">,</span> <span class="st">&#39;4,4,4&#39;</span><span class="kw">:</span> <span class="st">&#39;REGULAR&#39;</span>
+  <span class="kw">}</span>
+
+  <span class="co"># 直角三角形、その他</span>
+  <span class="dt">@cases_result_misc_0</span> <span class="kw">:</span>  <span class="kw">[</span>
+      <span class="kw">[</span><span class="dv">90</span><span class="kw">,</span><span class="dv">90</span><span class="kw">,</span><span class="dv">90</span><span class="kw">,</span>   <span class="st">&#39;REGULAR&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">90</span><span class="kw">,</span><span class="dv">90</span><span class="kw">,</span><span class="dv">1</span><span class="kw">,</span>    <span class="st">&#39;ISO&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">90</span><span class="kw">,</span><span class="dv">45</span><span class="kw">,</span><span class="dv">45</span><span class="kw">,</span>   <span class="st">&#39;NG&#39;</span><span class="kw">]</span>
+    <span class="kw">]</span>
+
+  <span class="dt">@cases_result_misc_1</span> <span class="kw">:</span>  <span class="kw">[</span>
+      <span class="kw">[</span><span class="dv">3</span><span class="kw">,</span><span class="dv">4</span><span class="kw">,</span><span class="dv">5</span><span class="kw">,</span>      <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">5</span><span class="kw">,</span><span class="dv">12</span><span class="kw">,</span><span class="dv">13</span><span class="kw">,</span>    <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">6</span><span class="kw">,</span><span class="dv">8</span><span class="kw">,</span><span class="dv">10</span><span class="kw">,</span>     <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">7</span><span class="kw">,</span><span class="dv">24</span><span class="kw">,</span><span class="dv">25</span><span class="kw">,</span>    <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">8</span><span class="kw">,</span><span class="dv">15</span><span class="kw">,</span><span class="dv">17</span><span class="kw">,</span>    <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">9</span><span class="kw">,</span><span class="dv">12</span><span class="kw">,</span><span class="dv">15</span><span class="kw">,</span>    <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">9</span><span class="kw">,</span><span class="dv">40</span><span class="kw">,</span><span class="dv">41</span><span class="kw">,</span>    <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">10</span><span class="kw">,</span><span class="dv">24</span><span class="kw">,</span><span class="dv">26</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">11</span><span class="kw">,</span><span class="dv">60</span><span class="kw">,</span><span class="dv">61</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">12</span><span class="kw">,</span><span class="dv">16</span><span class="kw">,</span><span class="dv">20</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">12</span><span class="kw">,</span><span class="dv">35</span><span class="kw">,</span><span class="dv">37</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">13</span><span class="kw">,</span><span class="dv">84</span><span class="kw">,</span><span class="dv">85</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">14</span><span class="kw">,</span><span class="dv">48</span><span class="kw">,</span><span class="dv">50</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">15</span><span class="kw">,</span><span class="dv">20</span><span class="kw">,</span><span class="dv">25</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">15</span><span class="kw">,</span><span class="dv">36</span><span class="kw">,</span><span class="dv">39</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">15</span><span class="kw">,</span><span class="dv">112</span><span class="kw">,</span><span class="dv">113</span><span class="kw">,</span> <span class="st">&#39;NG-INPUT&#39;</span><span class="kw">]</span> <span class="co"># RIBHT</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">16</span><span class="kw">,</span><span class="dv">63</span><span class="kw">,</span><span class="dv">65</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">17</span><span class="kw">,</span><span class="dv">144</span><span class="kw">,</span><span class="dv">145</span><span class="kw">,</span> <span class="st">&#39;NG-INPUT&#39;</span><span class="kw">]</span> <span class="co"># RIGHT</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">18</span><span class="kw">,</span><span class="dv">24</span><span class="kw">,</span><span class="dv">30</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">18</span><span class="kw">,</span><span class="dv">80</span><span class="kw">,</span><span class="dv">82</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">19</span><span class="kw">,</span><span class="dv">180</span><span class="kw">,</span><span class="dv">181</span><span class="kw">,</span> <span class="st">&#39;NG-INPUT&#39;</span><span class="kw">]</span> <span class="co"># RIGHT</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">20</span><span class="kw">,</span><span class="dv">21</span><span class="kw">,</span><span class="dv">29</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">20</span><span class="kw">,</span><span class="dv">48</span><span class="kw">,</span><span class="dv">52</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">20</span><span class="kw">,</span><span class="dv">99</span><span class="kw">,</span><span class="dv">101</span><span class="kw">,</span>  <span class="st">&#39;NG-INPUT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">21</span><span class="kw">,</span><span class="dv">28</span><span class="kw">,</span><span class="dv">35</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">21</span><span class="kw">,</span><span class="dv">72</span><span class="kw">,</span><span class="dv">75</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">22</span><span class="kw">,</span><span class="dv">120</span><span class="kw">,</span><span class="dv">122</span><span class="kw">,</span> <span class="st">&#39;NG-INPUT&#39;</span><span class="kw">]</span> <span class="co"># RIGHT</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">24</span><span class="kw">,</span><span class="dv">32</span><span class="kw">,</span><span class="dv">40</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">24</span><span class="kw">,</span><span class="dv">45</span><span class="kw">,</span><span class="dv">51</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">24</span><span class="kw">,</span><span class="dv">70</span><span class="kw">,</span><span class="dv">74</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">24</span><span class="kw">,</span><span class="dv">143</span><span class="kw">,</span><span class="dv">145</span><span class="kw">,</span> <span class="st">&#39;NG-INPUT&#39;</span><span class="kw">]</span> <span class="co"># RIGHT</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">25</span><span class="kw">,</span><span class="dv">60</span><span class="kw">,</span><span class="dv">65</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">26</span><span class="kw">,</span><span class="dv">168</span><span class="kw">,</span><span class="dv">170</span><span class="kw">,</span> <span class="st">&#39;NG-INPUT&#39;</span><span class="kw">]</span> <span class="co"># RIGHT</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">27</span><span class="kw">,</span><span class="dv">36</span><span class="kw">,</span><span class="dv">45</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">27</span><span class="kw">,</span><span class="dv">120</span><span class="kw">,</span><span class="dv">123</span><span class="kw">,</span> <span class="st">&#39;NG-INPUT&#39;</span><span class="kw">]</span> <span class="co"># RIGHT</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">28</span><span class="kw">,</span><span class="dv">45</span><span class="kw">,</span><span class="dv">53</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">28</span><span class="kw">,</span><span class="dv">96</span><span class="kw">,</span><span class="dv">100</span><span class="kw">,</span>  <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">28</span><span class="kw">,</span><span class="dv">195</span><span class="kw">,</span><span class="dv">197</span><span class="kw">,</span> <span class="st">&#39;NG-INPUT&#39;</span><span class="kw">]</span> <span class="co"># RIGHT</span>
+    <span class="kw">,</span> <span class="kw">[</span><span class="dv">30</span><span class="kw">,</span><span class="dv">40</span><span class="kw">,</span><span class="dv">50</span><span class="kw">,</span>   <span class="st">&#39;RIGHT&#39;</span><span class="kw">]</span>
+  <span class="kw">]</span>
+
+module<span class="kw">.</span>exports <span class="kw">=</span> Triangle_cases
+
+<span class="co">#--- End of File ---</span></code></pre></td></tr></table>
+<ol start="2" type="1">
+<li><a href="../spec/triangle_test_1.coffee">spec/triangle_test_1.coffee</a> の内容</li>
+</ol>
+<table class="sourceCode coffeescript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+</pre></td><td class="sourceCode"><pre><code class="sourceCode coffeescript">vows <span class="kw">=</span> require <span class="st">&#39;vows&#39;</span>
+assert <span class="kw">=</span> require <span class="st">&#39;assert&#39;</span>
+Triangle <span class="kw">=</span> require <span class="st">&#39;../src/triangle&#39;</span>
+Triangle_cases <span class="kw">=</span> require <span class="st">&#39;./triangle_cases&#39;</span>
+
+ans <span class="kw">=</span> <span class="fu">(a,b,c) -&gt;</span>
+  <span class="co"># cases_result_555[&quot;#{a},#{b},#{c}&quot;]</span>
+  Triangle_cases<span class="kw">.</span>cases_result_555<span class="kw">[[</span>a<span class="kw">,</span>b<span class="kw">,</span>c<span class="kw">]]</span>
+
+vows<span class="kw">.</span>describe<span class="kw">(</span><span class="st">&#39;Triangle:正数と０&#39;</span><span class="kw">)</span>
+<span class="kw">.</span>addBatch
+  <span class="st">&quot;正数と０&quot;</span><span class="kw">:</span>
+    topic<span class="kw">:</span> <span class="fu">() -&gt;</span>
+      <span class="dt">@triangle</span> <span class="kw">=</span> <span class="kw">new</span> <span class="dt">Triangle</span>
+
+    <span class="st">&#39;[0..4] * [0..4] * [0..4]&#39;</span><span class="kw">:</span> <span class="fu">(err, browser, status) -&gt;</span>
+      <span class="kw">for</span> a <span class="kw">in</span> <span class="kw">[</span><span class="dv">0</span><span class="kw">..</span><span class="dv">4</span><span class="kw">]</span>
+        <span class="kw">for</span> b <span class="kw">in</span> <span class="kw">[</span><span class="dv">0</span><span class="kw">..</span><span class="dv">4</span><span class="kw">]</span>
+          <span class="kw">for</span> c <span class="kw">in</span> <span class="kw">[</span><span class="dv">0</span><span class="kw">..</span><span class="dv">4</span><span class="kw">]</span>
+            <span class="co"># kind() の結果をチェックする。</span>
+            assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;0 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(a, b ,c)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;0 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>ans(a,c,b)<span class="ch">}</span>
+<span class="st">            # a,b,c の順番に kind() が依存していないことをチェックする</span>
+<span class="st">            assert.equal(&quot;</span><span class="dv">1</span> <span class="co">#{a},#{b},#{c}:#{@triangle.kind(a, b ,c)}&quot;, &quot;1 #{a},#{b},#{c}:#{@triangle.kind(a,c,b)}&quot;)</span>
+            assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;2 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(a, b ,c)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;2 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(b,a,c)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+            assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;3 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(a, b ,c)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;3 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(b,c,a)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+            assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;4 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(a, b ,c)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;4 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(c,a,b)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+            assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;5 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(a, b ,c)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;5 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(c,b,a)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+
+    <span class="st">&quot;直角三角形, その他&quot;</span><span class="kw">:</span>
+      topic<span class="kw">:</span> <span class="fu">() -&gt;</span>
+        <span class="dt">@triangle</span> <span class="kw">=</span> <span class="kw">new</span> <span class="dt">Triangle</span><span class="kw">()</span>
+
+      <span class="st">&#39;直角三角形, その他&#39;</span><span class="kw">:</span> <span class="fu">(err, browser, status) -&gt;</span>
+        <span class="kw">for</span> <span class="kw">[</span>a<span class="kw">,</span>b<span class="kw">,</span>c<span class="kw">,</span>kind<span class="kw">]</span> <span class="kw">in</span> Triangle_cases<span class="kw">.</span>cases_result_misc_0
+          <span class="co"># a,b,c の順番に kind() が依存していないことをチェックする</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;1 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(a, b, c)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;1 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;2 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(a, c, b)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;2 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;3 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(b, a, c)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;3 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;4 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(b, c, a)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;4 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;5 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(c, a, b)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;5 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;6 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(c, b, a)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;6 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+
+      <span class="st">&#39;直角三角形, その他&#39;</span><span class="kw">:</span> <span class="fu">(err, browser, status) -&gt;</span>
+        <span class="kw">for</span> <span class="kw">[</span>a<span class="kw">,</span>b<span class="kw">,</span>c<span class="kw">,</span>kind<span class="kw">]</span> <span class="kw">in</span> Triangle_cases<span class="kw">.</span>cases_result_misc_1
+          <span class="co"># a,b,c の順番に kind() が依存していないことをチェックする</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;1 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(a, b, c)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;1 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;2 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(a, c, b)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;2 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;3 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(b, a, c)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;3 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;4 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(b, c, a)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;4 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;5 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(c, a, b)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;5 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+          assert<span class="kw">.</span>equal<span class="kw">(</span><span class="st">&quot;6 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>@triangle.kind(c, b, a)<span class="ch">}</span><span class="st">&quot;</span><span class="kw">,</span> <span class="st">&quot;6 </span><span class="ch">#{</span>a<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>b<span class="ch">}</span><span class="st">,</span><span class="ch">#{</span>c<span class="ch">}</span><span class="st">:</span><span class="ch">#{</span>kind<span class="ch">}</span><span class="st">&quot;</span><span class="kw">)</span>
+
+ <span class="kw">...</span> 省略 <span class="kw">...</span></code></pre></td></tr></table>
+<a name="クライアントからのテスト" />
+<h2 id="クライアントからのテスト">2.クライアントからのテスト</h2>
+<a name="cake test" />
+<h3 id="cake-test">2.1. cake test</h3>
+<p>この場合は, <a href="http://zombie.labnotes.org/" title="zombie">zombie</a> という HTTP-client を利用して、<br>　　　html フォームでの値設定、ajax 呼び出し、返り値の取得<br>という操作をロボット操作する。<br>判定結果が表示される部分の文字列を DOM 操作で取り出して,サーバーサイドの関数の挙動をテストする。</p>
+<p>コンソール画面から、１コマンド実行 (1 行目) するだけで、テスト結果 (181 行目) が得られる。<br>処理時間は 1.5 秒である。</p>
+<div style="margin:0 auto 0 auto; width:70%">
+<a href='movies/2012-03-11_0023-spec-test.swf'>動画 (2012-03-11_0023-spec-test.swf)</a> 18秒目以降
+</div>
+
+
+<table class="sourceCode bash numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+</pre></td><td class="sourceCode"><pre><code class="sourceCode bash">$ cake <span class="kw">test</span>
+Express server listening on port 3003 <span class="kw">in</span> development mode
+
+♢ <span class="kw">test</span> <span class="kw">for</span> triangle_bad
+  check get_method
+    ✓ get [1 1 1]
+  check empty press
+    ✓ see result
+  check 3 4 5 [3 4 5]
+    ✓ see result
+  check 1 1 2 [1 1 2]
+    ✓ see result
+  check 2 2 1 [2 2 1]
+    ✓ see result
+  check 2 3 4 [2 3 4]
+    ✓ see result
+  check 2 3 101 [2 3 101]
+    ✓ see result
+  check 30 40 50 [30 40 50]
+    ✓ see result
+  check 51 52 53 [51 52 53]
+    ✓ see result
+  check 1.2 10 10 [1.2 10 10]
+    ✓ see result
+  check 1 1 1 [1 1 1]
+    ✓ see result
+  check 10 1.2 10 [10 1.2 10]
+    ✓ see result
+  check 10 10 1.2 [10 10 1.2]
+    ✓ see result
+ 
+♢ <span class="kw">test</span> <span class="kw">for</span> triangle
+  check get_method
+    ✓ get [1 1 1]
+  check empty press
+    ✓ see result
+  check 1 1 1 [1 1 1]
+    ✓ see result
+  check 3 4 5 [3 4 5]
+    ✓ see result
+  check 1 1 2 [1 1 2]
+    ✓ see result
+  check 2 2 1 [2 2 1]
+    ✓ see result
+  check 2 3 4 [2 3 4]
+    ✓ see result
+  check 2 3 101 [2 3 101]
+    ✓ see result
+  check 30 40 50 [30 40 50]
+    ✓ see result
+  check 51 52 53 [51 52 53]
+    ✓ see result
+  check 10 1.2 10 [10 1.2 10]
+    ✓ see result
+  check 10 10 1.2 [10 10 1.2]
+    ✓ see result
+  check 1.2 10 10 [1.2 10 10]
+    ✓ see result
+ 
+✓ OK » 26 honored <span class="kw">(</span>1.468s<span class="kw">)</span>
+
+
+real    0m1.633s
+user    0m1.322s
+sys 0m0.174s</code></pre></td></tr></table>
+<p>　　　　　＊コードカバレージ計測結果＊</p>
+<div>
+<a href='images/coverage-report-002.png'><img src='images/coverage-report-002.png' width="50%" height="50%" alt=''/></a>
+</div>
+
+
+<ol type="1">
+<li><a href="../test/triangle_test_1.coffee">test/triangle_test_1.coffee</a><br/>の内容</li>
+</ol>
+<table class="sourceCode coffeescript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+</pre></td><td class="sourceCode"><pre><code class="sourceCode coffeescript"><span class="co"># 三角形の形状判定</span>
+
+vows <span class="kw">=</span> require <span class="st">&#39;vows&#39;</span>
+assert <span class="kw">=</span> require <span class="st">&#39;assert&#39;</span>
+zombie <span class="kw">=</span> require <span class="st">&#39;zombie&#39;</span>
+<span class="co"># app = require &#39;../src/app&#39;</span>
+singleton_app <span class="kw">=</span> require <span class="st">&#39;./app_singleton&#39;</span>
+app <span class="kw">=</span> singleton_app<span class="kw">.</span>get<span class="kw">()</span>
+
+<span class="co"># Start server for test.</span>
+app<span class="kw">.</span>start<span class="kw">()</span>
+
+port <span class="kw">=</span> app<span class="kw">.</span>port
+baseUrl <span class="kw">=</span> <span class="st">&quot;http://localhost:</span><span class="ch">#{</span>port<span class="ch">}</span><span class="st">&quot;</span>
+
+<span class="co"># get_result =  (window) -&gt;</span>
+<span class="co">#   window.querySelector(&#39;#result&#39;)</span>
+
+new_browser <span class="kw">=</span> <span class="fu">() -&gt;</span>
+  browser <span class="kw">=</span> <span class="kw">new</span> <span class="dt">zombie.Browser</span><span class="kw">({</span> debug<span class="kw">:</span> <span class="ot">false</span> <span class="kw">})</span>
+  browser<span class="kw">.</span>runScripts <span class="kw">=</span> <span class="ot">true</span>
+  browser<span class="kw">.</span>waitFor <span class="kw">=</span> <span class="dv">3000</span>
+  browser
+
+vows<span class="kw">.</span>describe<span class="kw">(</span><span class="st">&quot;test for triangle&quot;</span><span class="kw">)</span>
+<span class="kw">.</span>addBatch
+  <span class="st">&quot;check empty&quot;</span><span class="kw">:</span>
+    topic<span class="kw">:</span> <span class="fu">() -&gt;</span>
+      new_browser<span class="kw">().</span>visit baseUrl<span class="kw">,</span> <span class="dt">@callback</span>
+    <span class="st">&#39;press&#39;</span><span class="kw">:</span>
+      topic<span class="kw">:</span> <span class="fu">(browser) -&gt;</span>
+        browser<span class="kw">.</span>pressButton<span class="kw">(</span><span class="st">&#39;#my_submit_1&#39;</span><span class="kw">,</span> <span class="dt">@callback</span><span class="kw">)</span>
+      <span class="st">&quot;see result&quot;</span> <span class="kw">:</span> <span class="fu">(browser) -&gt;</span>
+        assert<span class="kw">.</span>equal<span class="kw">(</span>browser<span class="kw">.</span>text<span class="kw">(</span><span class="st">&#39;#result&#39;</span><span class="kw">),</span> <span class="st">&#39;a:empty b:empty c:empty &#39;</span><span class="kw">)</span>
+
+  <span class="st">&quot;check 1 1 1&quot;</span><span class="kw">:</span>
+    topic<span class="kw">:</span> <span class="fu">() -&gt;</span>
+      new_browser<span class="kw">().</span>visit baseUrl<span class="kw">,</span> <span class="dt">@callback</span>
+    <span class="st">&#39;[1 1 1]&#39;</span><span class="kw">:</span>
+      topic<span class="kw">:</span> <span class="fu">(browser) -&gt;</span>
+        browser<span class="kw">.</span>
+          fill<span class="kw">(</span><span class="st">&#39;data_a&#39;</span><span class="kw">,</span> <span class="st">&#39;1&#39;</span><span class="kw">).</span> fill<span class="kw">(</span><span class="st">&#39;data_b&#39;</span><span class="kw">,</span> <span class="st">&#39;1&#39;</span><span class="kw">).</span>fill<span class="kw">(</span><span class="st">&#39;data_c&#39;</span><span class="kw">,</span> <span class="st">&#39;1&#39;</span><span class="kw">).</span>
+          pressButton<span class="kw">(</span><span class="st">&#39;#my_submit_1&#39;</span><span class="kw">,</span> <span class="dt">@callback</span><span class="kw">)</span>
+      <span class="st">&quot;see result&quot;</span> <span class="kw">:</span> <span class="fu">(browser) -&gt;</span>
+        assert<span class="kw">.</span>equal<span class="kw">(</span>browser<span class="kw">.</span>text<span class="kw">(</span><span class="st">&#39;#result&#39;</span><span class="kw">),</span> <span class="st">&#39;正三角形&#39;</span><span class="kw">)</span>
+
+  <span class="st">&quot;check 3 4 5&quot;</span><span class="kw">:</span>
+    topic<span class="kw">:</span> <span class="fu">() -&gt;</span>
+      new_browser<span class="kw">().</span>visit baseUrl<span class="kw">,</span> <span class="dt">@callback</span>
+    <span class="st">&#39;[3 4 5]&#39;</span><span class="kw">:</span>
+      topic<span class="kw">:</span> <span class="fu">(browser) -&gt;</span>
+        browser<span class="kw">.</span>
+          fill<span class="kw">(</span><span class="st">&#39;data_a&#39;</span><span class="kw">,</span> <span class="st">&#39;3&#39;</span><span class="kw">).</span>fill<span class="kw">(</span><span class="st">&#39;data_b&#39;</span><span class="kw">,</span> <span class="st">&#39;4&#39;</span><span class="kw">).</span>fill<span class="kw">(</span><span class="st">&#39;data_c&#39;</span><span class="kw">,</span> <span class="st">&#39;5&#39;</span><span class="kw">).</span>
+          pressButton<span class="kw">(</span><span class="st">&#39;#my_submit_1&#39;</span><span class="kw">,</span> <span class="dt">@callback</span><span class="kw">)</span>
+      <span class="st">&quot;see result&quot;</span> <span class="kw">:</span> <span class="fu">(browser) -&gt;</span>
+        assert<span class="kw">.</span>equal<span class="kw">(</span>browser<span class="kw">.</span>text<span class="kw">(</span><span class="st">&#39;#result&#39;</span><span class="kw">),</span> <span class="st">&#39;直角三角形&#39;</span><span class="kw">)</span>
+
+  <span class="st">&quot;check 1 1 2&quot;</span><span class="kw">:</span>
+    topic<span class="kw">:</span> <span class="fu">() -&gt;</span>
+      new_browser<span class="kw">().</span>visit baseUrl<span class="kw">,</span> <span class="dt">@callback</span>
+    <span class="st">&#39;[1 1 2]&#39;</span><span class="kw">:</span>
+      topic<span class="kw">:</span> <span class="fu">(browser) -&gt;</span>
+        browser<span class="kw">.</span>
+          fill<span class="kw">(</span><span class="st">&#39;data_a&#39;</span><span class="kw">,</span> <span class="st">&#39;1&#39;</span><span class="kw">).</span>fill<span class="kw">(</span><span class="st">&#39;data_b&#39;</span><span class="kw">,</span> <span class="st">&#39;1&#39;</span><span class="kw">).</span>fill<span class="kw">(</span><span class="st">&#39;data_c&#39;</span><span class="kw">,</span> <span class="st">&#39;2&#39;</span><span class="kw">).</span>
+          pressButton<span class="kw">(</span><span class="st">&#39;#my_submit_1&#39;</span><span class="kw">,</span> <span class="dt">@callback</span><span class="kw">)</span>
+      <span class="st">&quot;see result&quot;</span> <span class="kw">:</span> <span class="fu">(browser) -&gt;</span>
+        assert<span class="kw">.</span>equal<span class="kw">(</span>browser<span class="kw">.</span>text<span class="kw">(</span><span class="st">&#39;#result&#39;</span><span class="kw">),</span> <span class="st">&#39;三角形が作れません&#39;</span><span class="kw">)</span>
+
+  <span class="st">&quot;check 2 2 1&quot;</span><span class="kw">:</span>
+    topic<span class="kw">:</span> <span class="fu">() -&gt;</span>
+      new_browser<span class="kw">().</span>visit baseUrl<span class="kw">,</span> <span class="dt">@callback</span>
+    <span class="st">&#39;[2 2 1]&#39;</span><span class="kw">:</span>
+      topic<span class="kw">:</span> <span class="fu">(browser) -&gt;</span>
+        browser<span class="kw">.</span>
+          fill<span class="kw">(</span><span class="st">&#39;data_a&#39;</span><span class="kw">,</span> <span class="st">&#39;2&#39;</span><span class="kw">).</span>fill<span class="kw">(</span><span class="st">&#39;data_b&#39;</span><span class="kw">,</span> <span class="st">&#39;2&#39;</span><span class="kw">).</span>fill<span class="kw">(</span><span class="st">&#39;data_c&#39;</span><span class="kw">,</span> <span class="st">&#39;1&#39;</span><span class="kw">).</span>
+          pressButton<span class="kw">(</span><span class="st">&#39;#my_submit_1&#39;</span><span class="kw">,</span> <span class="dt">@callback</span><span class="kw">)</span>
+      <span class="st">&quot;see result&quot;</span> <span class="kw">:</span> <span class="fu">(browser) -&gt;</span>
+        assert<span class="kw">.</span>equal<span class="kw">(</span>browser<span class="kw">.</span>text<span class="kw">(</span><span class="st">&#39;#result&#39;</span><span class="kw">),</span> <span class="st">&#39;二等辺三角形&#39;</span><span class="kw">)</span>
+
+<span class="kw">...</span> 諸略 <span class="kw">...</span></code></pre></td></tr></table>
+<a name="qunit を使う" />
+<h2 id="qunit-を使う">2.2 qunit を使う</h2>
+<p><a href="http://docs.jquery.com/QUnit/" title="qunit">qunit</a> でテストプログラムを書く。</p>
+<a name="実ブラウザ上で実行" />
+<h3 id="実ブラウザ上で実行">2.2.1 実ブラウザ上で実行</h3>
+<a name="cake test-client" />
+<div style="margin:0 auto 0 auto; width: 60%;">
+<a href='movies/2012-03-11_0032-test-client.swf' target='_blank'>動画</a> (1:31)
+</div>
+
+<a name="擬似ブラウザ上で実行" />
+<h3 id="擬似ブラウザ上で実行">2.2.2 擬似ブラウザ上で実行</h3>
+<a name="cake test-client-phantimjs" />
+<div style="margin:0 auto 0 auto; width: 60%;">
+<a href='movies/2012-03-11_0041-test-client-phantomjs.swf' target='_blank'>動画</a> (1:17)
+</div>
+
+<a name="cake test-phantomjs" />
+<h2 id="cake-test-phantomjs">2.3 cake test-phantomjs</h2>
+<div style="margin:0 auto 0 auto; width: 60%;">
+<a href='movies/2012-03-11_0054-test-phantomjs.swf' target='_blank'>動画</a> (1:11)
+</div>
+
+<a name="cake test-jsTestDrive" />
+<h2 id="cake-test-jstestdriver">2.4. cake test-jsTestDriver</h2>
+<div style="margin:0 auto 0 auto; width: 60%;">
+<a href='movies/2012-03-11_jsTestDriver.swf' target='_blank'>動画</a> (2:40)
+</div>
+
+<p><a href="http://docs.jquery.com/QUnit/" title="qunit">qunit</a> で書いたテストを実際のブラウザで実行する。<br>一度に複数の種類のブラウザでテストを実施することが可能である。</p>
+<a name="Selenium の利用"/>
+<h2 id="selenium-の利用">2.5. Selenium の利用</h2>
+<p>　実際のブラウザをロボット操作してテストする。<br>　プログラム本体に変更はせず、完全に外部からのロボット操作でテストをする。<br>　スクリーンショットの保存も可能。drag &amp; drop 操作の記述も可能。<br>　<a href="http://seleniumhq.org/" title="Selenium">Selenium</a> 1 で操作を記録し、それを java か ruby 形式でエクスポートして、<br>　<a href="http://seleniumhq.org/" title="Selenium">Selenium</a> 2 の WebDriver をつかうスクリプトに仕上げていくのが良いと思われる。<br>　(java/ruby といった言語なら、繰り返し、条件判定の記載は容易にできる。)</p>
+<table class="sourceCode xml numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+</pre></td><td class="sourceCode"><pre><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;<span class="kw">?&gt;</span>
+<span class="dt">&lt;!DOCTYPE </span>html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;<span class="dt">&gt;</span>
+<span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;en&quot;</span><span class="ot"> lang=</span><span class="st">&quot;en&quot;</span><span class="kw">&gt;</span>
+<span class="kw">&lt;head</span><span class="ot"> profile=</span><span class="st">&quot;http://selenium-ide.openqa.org/profiles/test-case&quot;</span><span class="kw">&gt;</span>
+<span class="kw">&lt;meta</span><span class="ot"> http-equiv=</span><span class="st">&quot;Content-Type&quot;</span><span class="ot"> content=</span><span class="st">&quot;text/html; charset=UTF-8&quot;</span> <span class="kw">/&gt;</span>
+<span class="kw">&lt;link</span><span class="ot"> rel=</span><span class="st">&quot;selenium.base&quot;</span><span class="ot"> href=</span><span class="st">&quot;http://localhost:3000/&quot;</span> <span class="kw">/&gt;</span>
+<span class="kw">&lt;title&gt;</span>sample-00<span class="kw">&lt;/title&gt;</span>
+<span class="kw">&lt;/head&gt;</span>
+<span class="kw">&lt;body&gt;</span>
+<span class="kw">&lt;table</span><span class="ot"> cellpadding=</span><span class="st">&quot;1&quot;</span><span class="ot"> cellspacing=</span><span class="st">&quot;1&quot;</span><span class="ot"> border=</span><span class="st">&quot;1&quot;</span><span class="kw">&gt;</span>
+<span class="kw">&lt;thead&gt;</span>
+<span class="kw">&lt;tr&gt;&lt;td</span><span class="ot"> rowspan=</span><span class="st">&quot;1&quot;</span><span class="ot"> colspan=</span><span class="st">&quot;3&quot;</span><span class="kw">&gt;</span>sample-00<span class="kw">&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="kw">&lt;/thead&gt;&lt;tbody&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>open<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>/<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>assertTitle<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>Express<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>assertText<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>result<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>click<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>id=my_submit_1<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>waitForText<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>result<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>a:empty b:empty c:empty<span class="kw">&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>assertText<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>result<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>a:empty b:empty c:empty<span class="kw">&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>type<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>id=data_a<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>1<span class="kw">&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>type<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>id=data_b<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>2<span class="kw">&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>type<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>id=data_c<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>3<span class="kw">&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>click<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>id=my_submit_1<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>1<span class="kw">&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>waitForText<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>result<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>三角形が作れません<span class="kw">&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+<span class="kw">&lt;tr&gt;</span>
+    <span class="kw">&lt;td&gt;</span>assertText<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>result<span class="kw">&lt;/td&gt;</span>
+    <span class="kw">&lt;td&gt;</span>三角形が作れません<span class="kw">&lt;/td&gt;</span>
+<span class="kw">&lt;/tr&gt;</span>
+... 省略 ...</code></pre></td></tr></table>
+<a name="cake test-selenium_1" />
+<h3 id="cake-test-selenium_1">2.5.1. cake test-selenium_1</h3>
+<div style="margin:0 auto 0 auto; width: 60%;">
+<a href='movies/2012-03-17_2015-selenium_1.swf' target='_blank'>動画</a> (0.23)
+</div>
+
+<p>　フォームに数値を記入、判定実行ボタンを押す という操作を録画モードでスクリプトに記録する。<br>　あとから 判定結果の判定スクリプトを挿入することでテストスクリプトにしていく。<br>　スクリプトファイル実際の形式は XHTML であり、テキストエディタでの編集はすこし面倒。</p>
+<a name="cake test-selenium_2" />
+<h3 id="cake-test-selenium_2">2.5.2. cake test-selenium_2</h3>
+<div style="margin:0 auto 0 auto; width: 60%;">
+<a href='movies/2012-03-18_0213-selenium_2.swf' target='_blank'>動画</a> (1:53)
+</div>
+
+<p>　<a href="http://seleniumhq.org/" title="Selenium">Selenium</a> 1 で作成したスクリプトを ruby スクリプトで export し、それをベースにテストスクリプトを作成している。<br> テストスクリプトは、javascript で作成することも可能。<br> ここでは ruby でつくったものと同等のものを [coffeescrpt][] で作成してみた。</p>
+<table class="sourceCode ruby numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+</pre></td><td class="sourceCode"><pre><code class="sourceCode ruby">require <span class="st">&quot;rubygems&quot;</span>
+require <span class="st">&quot;selenium-webdriver&quot;</span>
+require <span class="st">&quot;test/unit&quot;</span>
+
+<span class="dt">$KCODE</span> = <span class="st">&#39;utf-8&#39;</span>
+
+<span class="kw">class</span> <span class="dt">Test1</span> &lt; <span class="dt">Test</span>::<span class="dt">Unit</span>::<span class="dt">TestCase</span>
+
+  <span class="kw">def</span> setup
+    <span class="co"># @driver = Selenium::WebDriver.for :firefox</span>
+    <span class="ot">@driver</span> = <span class="dt">Selenium</span>::<span class="dt">WebDriver</span>.for <span class="st">:chrome</span>
+
+    <span class="ot">@base_url</span> = <span class="st">&quot;http://localhost:3000/&quot;</span>
+    <span class="ot">@driver</span>.manage.timeouts.implicit_wait = <span class="dv">5</span>
+    <span class="ot">@verification_errors</span> = []
+  <span class="kw">end</span>
+  
+  <span class="kw">def</span> teardown
+    <span class="ot">@driver</span>.quit
+    assert_equal [], <span class="ot">@verification_errors</span>
+  <span class="kw">end</span>
+  
+  <span class="kw">def</span> test_1
+    <span class="ot">@driver</span>.get(<span class="ot">@base_url</span> + <span class="st">&quot;/&quot;</span>)
+    assert_equal <span class="st">&quot;Express&quot;</span>, <span class="ot">@driver</span>.title
+
+    wait = <span class="dt">Selenium</span>::<span class="dt">WebDriver</span>::<span class="dt">Wait</span>.new(<span class="st">:timeout</span> =&gt; <span class="dv">5</span>) <span class="co"># seconds</span>
+
+    <span class="ot">@driver</span>.find_element(<span class="st">:id</span>, <span class="st">&quot;my_submit_1&quot;</span>).click
+    wait.until { <span class="ot">@driver</span>.find_element(<span class="st">:id</span>, <span class="st">&quot;result&quot;</span>).text == <span class="st">&quot;a:empty b:empty c:empty&quot;</span>}
+    assert_equal <span class="st">&quot;a:empty b:empty c:empty&quot;</span>,  <span class="ot">@driver</span>.find_element(<span class="st">:id</span>, <span class="st">&quot;result&quot;</span>).text, <span class="st">&quot;&quot;</span>
+
+    <span class="ot">@driver</span>.find_element(<span class="st">:id</span>, <span class="st">&quot;data_a&quot;</span>).clear
+    <span class="ot">@driver</span>.find_element(<span class="st">:id</span>, <span class="st">&quot;data_a&quot;</span>).send_keys &lt;strpng&gt;<span class="st">&quot;1&quot;</span>&lt;<span class="ot">/strong&gt;</span>
+<span class="ot">    @driver.find_element(:id, &quot;data_b&quot;).clear</span>
+<span class="ot">    @driver.find_element(:id, &quot;data_b&quot;).send_keys &quot;2&quot;</span>
+<span class="ot">    @driver.find_element(:id, &quot;data_c&quot;).clear</span>
+<span class="ot">    @driver.find_element(:id, &quot;data_c&quot;).send_keys &quot;3&quot;</span>
+<span class="ot">    @driver.find_element(:id, &quot;my_submit_1&quot;).click</span>
+<span class="ot">    wait.until { @driver.find_element(:id, &quot;result&quot;).text == &quot;三角形が作れません&quot;}</span>
+<span class="ot">    assert_equal &quot;三角形が作れません&quot;,  @driver.find_element(:id, &quot;result&quot;).text, &quot;三角形が作れません&quot;</span>
+
+<span class="ot">... 省略 ...</span>
+
+<span class="ot">end</span>
+<span class="ot">                                  </span></code></pre></td></tr></table>
+<p>テストスクリプトは、javascript で作成することも可能。<br> ここでは ruby でつくったものと同等のものを [coffeescrpt][] で作成してみた。</p>
+<table class="sourceCode ruby numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+</pre></td><td class="sourceCode"><pre><code class="sourceCode ruby">vows = require(<span class="st">&#39;vows&#39;</span>)
+assert = require(<span class="st">&#39;assert&#39;</span>)
+async = require(<span class="st">&#39;async&#39;</span>);
+
+webdriverjs = require(<span class="st">&quot;webdriverjs&quot;</span>)
+fs = require(<span class="st">&quot;fs&quot;</span>)
+
+vows.describe(<span class="st">&#39;Triangle:正数と０&#39;</span>)
+.addBatch
+  <span class="st">&quot;xxx&quot;</span>:
+    topic: () -&gt;
+      <span class="ot">@client</span> = webdriverjs.remote(desiredCapabilities: {browserName: <span class="st">&quot;chrome&quot;</span>} )
+
+    teardown: (topic) -&gt;
+
+    <span class="st">&quot;x&quot;</span>: (topic) -&gt;
+      <span class="ot">@client</span>
+        .init()
+        .url(<span class="st">&quot;http://localhost:3000&quot;</span>)
+        .click(<span class="st">&quot;#my_submit_1&quot;</span>)
+        .getText(<span class="st">&quot;#result&quot;</span>, (result) -&gt;
+          this.saveScreenshot(<span class="st">&quot;coffee-triangke-01.png&quot;</span>)
+          assert.equal(result.value, <span class="st">&quot;a:empty b:empty c:empty&quot;</span>)
+        )
+        .url(<span class="st">&quot;http://localhost:3000&quot;</span>)
+        .setValue(<span class="st">&quot;#data_a&quot;</span>, <span class="st">&quot;1&quot;</span>)
+        .setValue(<span class="st">&quot;#data_b&quot;</span>, <span class="st">&quot;2&quot;</span>)
+        .setValue(<span class="st">&quot;#data_c&quot;</span>, <span class="st">&quot;3&quot;</span>)
+        .click(<span class="st">&quot;#my_submit_1&quot;</span>)
+        .getText(<span class="st">&quot;#result&quot;</span>, (result) -&gt;
+            this.saveScreenshot(<span class="st">&quot;coffee-triangke-02.png&quot;</span>)
+            assert.equal(result.value, <span class="st">&quot;三角形が作れません&quot;</span>)
+        )
+... 省略 ...</code></pre></td></tr></table>
+<a name="テスト実行方法" />
+<h1 id="テスト実行方法">テスト実行方法</h1>
+<h2 id="環境の詳細説明">環境の詳細説明</h2>
+<p>Cakefile に手順を記載してある。<br/> 　　Makefile のようなもの。処理内容を [coffeescrpt][] で記載する。<br>　　$ cake で、 Cakefile に記載されている実行出来るコマンドの一覧が表示される。</p>
+<table class="sourceCode coffeescript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="sourceCode"><pre><code class="sourceCode coffeescript">$ cake
+Cakefile defines the following tasks<span class="kw">:</span>
+
+cake count                <span class="co"># how much files (*.coffee, *.js, *~)</span>
+cake compile              <span class="co"># Compile *.coffee</span>
+cake clean                <span class="co"># Clean compiled *.js *~</span>
+cake run                  <span class="co"># run application</span>
+cake setup                <span class="co"># setup node-modules</span>
+cake spec                 <span class="co"># spec</span>
+cake test                 <span class="co"># test and overage</span>
+cake inst                 <span class="co"># inst</span>
+cake test<span class="kw">-</span>client          <span class="co"># test-client</span>
+cake test<span class="kw">-</span>jsTestDriver    <span class="co"># jsTestDriver</span>
+cake test<span class="kw">-</span>phantomjs       <span class="co"># phantomjs</span>
+cake test<span class="kw">-</span>selenium_1      <span class="co"># selenium_1</span>
+cake test<span class="kw">-</span>selenium_2      <span class="co"># selenium_2</span>
+cake lint                 <span class="co"># lint</span>
+cake make<span class="kw">-</span>docs            <span class="co"># make docs/*.html, *.epub</span>
+cake clean<span class="kw">-</span>docs           <span class="co"># clean gnerated docs/*</span></code></pre></td></tr></table>
+<ol type="1">
+<li>cake count<br/> 　　　*.coffe, *.js. *~ のファイル数を数える。</li>
+<li>cake compile<br/> 　　　*.coffee を *.js にコンパイルする。</li>
+<li>cake clean<br/> 　*.coffee の　compile 結果や *~ ファイルを削除する。</li>
+<li>cake run<br/> 　　　web アプリを起動する。(停止は ctrl-C で)</li>
+<li>cake setup<br/> 　　　外部ライブラリーを download する。<br/> 　　　./node_modules 以下に保存さあれる。<br/> 　　　./package.json にライブラリー一覧の情報がある。</li>
+<li>cake spec<br/> 　　　サーバーサイドの単体テストを実行する。</li>
+<li>cake test<br/> 　　　http-client 経由で、サーバーサイドの単体テストを実行する。</li>
+<li>cake inst<br/> 　　　*.js ファイルにコードカバレージ計測のコードを埋め込む。</li>
+<li>cake test-client<br/> 　　　クライアントサイドのテストを行う。(<a href="http://docs.jquery.com/QUnit/" title="qunit">qunit</a>を利用)</li>
+<li>cake test-jsTestDriver<br/> 　　　クライアントサイドのテストを行う。(<a href="http://code.google.com/p/js-test-driver/" title="jsTestDriver">jsTestDriver</a>を利用)</li>
+<li>cake test-phantomjs<br/> 　　　クライアントサイドのテストを行う。([phantomjs][]を利用)</li>
+<li>cake test-selenium_1 　　　selenium 1 でテストを行う。</li>
+<li>cake test-selenium_2 　　　selenium 2 でテストを行う。　　　</li>
+<li>cake lint<br/> 　　　*.coffee の lint チェックを行う。</li>
+<li>cake make-docs<br/> 　　　docs/readme.md から html5 形式, epub 形式のドキュメントを生成する。</li>
+<li>cake clean-docs<br/> 　　　docs/ 以下にある html形式, epub 形式のファイルを削除する。</li>
+</ol>
+<h2 id="todo">TODO</h2>
+<p>　* jenkies などの CI ツールと組み合わせる。<br/> 　* サーバーサイド、クライアントサイドの　coffee, js ファイルの API ドキュメントを生成する。</p>
+<a name="参考" />
+<h1 id="参考">参考</h1>
+<ul>
+<li><p>quint<br>　- <a href="http://codedehitokoto.blogspot.com/2012/01/qunitjavascript.html">http://codedehitokoto.blogspot.com/2012/01/qunitjavascript.html</a><br>　&gt; コードで一言: QUnitでJavaScriptのユニットテストを始める<br> &gt;　&gt; …<br>　&gt; QUnitはもともとjQuery用のユニットテストでしたが、今ではjQueryに依存しないように作られていますので、JavaScriptをテストできます。<br>　&gt; JavaScriptの特徴でもある非同期のテストにも対応していますので、オススメです。<br> &gt;　&gt; …</p></li>
+<li><p>zombie<br>　- <a href="http://yume-build.com/blog/archives/13">http://yume-build.com/blog/archives/13</a><br>　&gt; Javascriptテストフレームワーク「Zombie.js」 | okame-log</p></li>
+<li><p>vows<br>　- <a href="http://firn.jp/2011/09/21/nodejs-tdd">http://firn.jp/2011/09/21/nodejs-tdd</a><br>　&gt; Node.js + Vowsではじめるテスト駆動開発 | FIRN.JP</p></li>
+<li><p>phantomjs<br>　- <a href='http://gihyo.jp/dev/column/newyear/2012/javascript-prospect'>http://gihyo.jp/dev/column/newyear/2012/javascript-prospect</a><br>　&gt; 新春特別企画：2012年のJavaScript～PCからモバイルの時代へ｜gihyo.jp … 技術評論社<br>　&gt;　&gt; …<br>　&gt; PhantomJSは，QtWebKitをJavaScriptのAPIで操作できるようにしたツールで，JavaScriptの実行結果を含めたスクレイピングやスクリーンショットを取るといったことが手軽にできるようになっています。当然このPhantomJSをJavaScriptのテスト環境として利用することもできます。実際のブラウザを操作するSeleniumよりも大幅に高速で，しかも実際のブラウザに極めて近い再現度という，比較的理想に近いテスト環境といえます。<br>　&gt;　&gt; …</p></li>
+<li><p>jsTestDriver<br>　- <a href="http://0-9.tumblr.com/post/15614207218/js-jstestdriver">http://0-9.tumblr.com/post/15614207218/js-jstestdriver</a><br>　&gt; JSの単体テストにJsTestDriverがおすすめ<br> &gt; 　&gt; …<br>　&gt; ・JsTestDriverとは何か？<br>　&gt; 　超簡単に言うとSelenium CoreのJS実装とQUnitを合わせたものです。<br>　&gt; 　実際Selenium ver2はJsTestDriverが使ってるWebDriverと言うAPIを使っています。<br>　&gt; 　（WebDriverがブラウザを外部から動かす共通仕様で、Selenium ver2とJsTestDriverはそれを使ってる状態）<br>　&gt; ・使った感想は？<br>　&gt; 　ブラウザ上で動作するJSの単体テスト環境としてはかなり快適です。<br>　&gt; 　普通にブラウザ起動してリロードしながらのテストでもいいですが、<br>　&gt; 　複数ブラウザで同時にテスト走らせて結果をまとめて表示させる環境としてはかなりいいです。<br>　&gt;　&gt; …</p></li>
+<li><p>Selenium 1<br>　- <a href="http://www.atmarkit.co.jp/fjava/rensai4/devtool07/devtool07_1.html">http://www.atmarkit.co.jp/fjava/rensai4/devtool07/devtool07_1.html</a><br>　&gt; ブラウザを選ばずWebテストを自動化するSelenium (1/3) - ＠IT</p></li>
+<li><p>Selenium 2<br>　- <a href="http://d.hatena.ne.jp/hutyao/20110822/1313978595">http://d.hatena.ne.jp/hutyao/20110822/1313978595</a><br>　&gt; WebDriverを統合したSelenium 2を使ってみる - ごにょろぐ</p></li>
+</ul>
+<p>//— End of File —</p>
+</body>
+</html>

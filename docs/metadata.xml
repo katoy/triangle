@@ -1,0 +1,11 @@
+<dc:title>javascript の自動テスト環境構築例</dc:title>
+<dc:creator opf:role="aut">加藤洋一</dc:creator>
+<dc:publisher>加藤出版</dc:publisher>
+<dc:subject>EPUB</dc:subject>
+<dc:subject>電子書籍</dc:subject>
+<dc:subject>HOWTO</dc:subject>
+<dc:description>javascript の自動テスト環境作を説明する。</dc:description>
+<dc:date opf:event="publication">2012-07-22</dc:date>
+<dc:date opf:event="modification">2012-07-22</dc:date>
+<dc:identifier id="BookID" opf:scheme="URL">https://github.com/katoy/triangle/docs</dc:identifier>
+<dc:language>ja</dc:language>
