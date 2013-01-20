@@ -1,3 +1,7 @@
+
+
+[![Build Status](https://travis-ci.org/katoy/triangle.png?branch=master)](undefined)
+
 USAGE
 ======
 
