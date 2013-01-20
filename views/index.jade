@@ -1,35 +1,37 @@
-h1= title
+extends layout
+block content
+  h1= title
 
-fieldset
-  h3= "3辺の長さを指定してください。三角形の形状を判定します。"
-  p   [-100 ... 100] の範囲の整数を妥当な指定と見なします。 
-  form
-    div
-      div.label a:
-      input#data_a(name="data_a", class="required hen")
-    div
-      div.label b:
-      input#data_b(name="data_b", class="required hen")
-    div
-      div.label c:
-      input#data_c(name="data_c", class="required hen")
+  fieldset
+    h3= "3辺の長さを指定してください。三角形の形状を判定します。"
+    p   [-100 ... 100] の範囲の整数を妥当な指定と見なします。 
+    form
+      div
+        div.label a:
+        input#data_a(name="data_a", class="required hen")
+      div
+        div.label b:
+        input#data_b(name="data_b", class="required hen")
+      div
+        div.label c:
+        input#data_c(name="data_c", class="required hen")
 
-    input#my_submit_0(name="my_submit_0", type="button", value="判定0")
-    input#my_submit_1(name="my_submit_1", type="button", value="判定1")
-    spawn= "　" 
-    spawn#result= ""
+      input#my_submit_0(name="my_submit_0", type="button", value="判定0")
+      input#my_submit_1(name="my_submit_1", type="button", value="判定1")
+      spawn= "　" 
+      spawn#result= ""
 
-pre
-  | 判定0 の実装では、判定処理内部での計算がオーバーフローする点を考慮していません。
-  | (整数の範囲を [-100, 100] として、オーバーフローチェックを２つの判定法の内部に組込んであります。)
-  | 次の入力を試してみてください。
-  |    a:100, b:99, c:98
-  |    a: 30, b:40, c:50
+  pre
+    | 判定0 の実装では、判定処理内部での計算がオーバーフローする点を考慮していません。
+    | (整数の範囲を [-100, 100] として、オーバーフローチェックを２つの判定法の内部に組込んであります。)
+    | 次の入力を試してみてください。
+    |    a:100, b:99, c:98
+    |    a: 30, b:40, c:50
 
-hr
+  hr
 
-a(href="coverage_spec.html", target="_blank")= "cake spec の coverage"
-= " ($ cake compile inst spec)"
-br
-a(href="coverage_test.html", target="_blank")= "cake test の coverage"
-= " ($ cake compile inst test)"
+  a(href="coverage_spec.html", target="_blank")= "cake spec の coverage"
+  = " ($ cake compile inst spec)"
+  br
+  a(href="coverage_test.html", target="_blank")= "cake test の coverage"
+  = " ($ cake compile inst test)"

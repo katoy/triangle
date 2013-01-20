@@ -45,7 +45,7 @@ run = (args...) ->
       when 'function' then callback = a
 
   command += ' ' + params.join ' ' if params?
-  cmd = spawn '/bin/sh', ['-c', command], options
+  cmd = spawn '/bin/sh', ['-c', '-b', command], options
   cmd.stdout.on 'data', (data) -> process.stdout.write data
   cmd.stderr.on 'data', (data) -> process.stderr.write data
   process.on 'SIGHUP', -> cmd.kill()
@@ -103,27 +103,38 @@ task "setup", "setup node-modules", ->
 task "spec", "spec and coverage", ->
   # run "jasmine-node spec --coffee spec"
   runSync "rm -f coverage.html", ->
-    runSync "vows spec/*_spec.coffee --spec --cover-html -v", ->
-      run "cp -f coverage.html public/coverage_spec.html"
+    runSync "vows spec/triangle*_spec.coffee -v --spec --cover-html", ->
+      run "cp -f coverage.html public/coverage_spec.html" if fs.existsSync('coverage.html')
       console.log "------------------------------------"
       console.log "   Triangle_bad は３つのテストが error になります。"
       console.log "   After finished, See ./coverage.html for coverage."
       console.log "------------------------------------"
 
+task "spec_better_lib", "spec and coverage for better lib", ->
+  runSync "rm -f coverage.html", ->
+    runSync "vows spec/triangle_spec.coffee --cover-html", ->
+      run "cp -f coverage.html public/coverage_spec.html" if fs.existsSync('coverage.html')
+
 task "test", "test and coverage", ->
   runSync "rm -f coverage.html", ->
-    runSync "vows test/triangle_test*.coffee --spec --cover-html", ->
-      run "cp -f coverage.html public/coverage_test.html"
-      console.log "------------------------------------"
-      console.log "   After finished, See ./coverage.html for coverage."
-      console.log "------------------------------------"
+    runSync "vows test/triangle_test_0.coffee -v --spec --cover-html", ->
+      runSync "vows test/triangle_test_1.coffee -v --spec --cover-html", ->
+        run "cp -f coverage.html public/coverage_test.html" if fs.existsSync('coverage.html')
+        console.log "------------------------------------"
+        console.log "   After finished, See ./coverage.html for coverage."
+        console.log "------------------------------------"
+
+task "test_better_lib", "test and coverage", ->
+  runSync "rm -f coverage.html", ->
+    runSync "vows test/triangle_test_1.coffee --cover-html", ->
+      run "cp -f coverage.html public/coverage_test.html" if fs.existsSync('coverage.html')
 
 task "inst", "inst", ->
   runSync "rm -fr #{SRC_INST_DIR}", ->
     run "mkdir #{SRC_INST_DIR}"
 
   runSync "cake compile", ->
-    runSync "jscoverage #{SRC_DIR} #{SRC_INST_DIR}", ->
+    runSync "jscov #{SRC_DIR} #{SRC_INST_DIR}", ->
       run "mv #{SRC_INST_DIR}/*.js #{SRC_DIR}"
 
 task "test-client", "test-client", ->

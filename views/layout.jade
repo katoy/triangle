@@ -1,12 +1,13 @@
-!!!
+doctype 5
 html
   head
     title= title
     meta(charset='utf-8')
-    script(src='/javascripts/jquery-1.7.1.min.js')
+    script(src='/javascripts/jquery-1.9.0.min.js')
     script(src='/javascripts/jquery.watermark.min.js')
     script(src='/javascripts/myscript.js')
 
-    link(rel='stylesheet', href='/stylesheets/trontastic/jquery-ui-1.8.16.custom.css')
+    link(rel='stylesheet', href='/stylesheets/trontastic/jquery-ui-1.10.0.custom.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
-  body!= body
+  body
+    block content

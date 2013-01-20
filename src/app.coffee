@@ -3,11 +3,13 @@ express = require 'express'
 triangle_bad = require './triangle-bad'
 triangle = require './triangle'
 
+http = require 'http'
+
 logger = express.logger
 
 routes = require '../routes'
 
-app = module.exports = express.createServer()
+app = module.exports = express()
 
 app.configure ->
   app.use express.logger()
@@ -17,7 +19,7 @@ app.configure ->
   app.use express.bodyParser()
   app.use express.methodOverride()
 
-  app.use require('stylus').middleware(src: __dirname + '/..//public')
+  app.use require('stylus').middleware(src: __dirname + '/../public')
   app.use app.router
   app.use express.static(__dirname + '/../public')
 
@@ -29,6 +31,8 @@ app.configure 'development', ->
 
 app.configure 'production', ->
   app.use express.errorHandler()
+
+app.locals({ title: 'Triangle'})
 
 app.get '/', routes.index
 
@@ -100,6 +104,8 @@ app.get '/triangle_1', (req, res) ->
 # port = argv[0] || process.env.PORT || 3000
 # app.listen port
 # console.log 'Express server listening on port %d in %s mode', app.address().port, app.settings.env
+server = null
 module.exports.start = (port) ->
-  app.listen port
-  console.log "Express server listening on port #{port} in #{app.settings.env} mode"
+  server = http.createServer(app)
+  server.listen port, ->
+    console.log "Express server listening on port #{port} in #{app.settings.env} mode"
