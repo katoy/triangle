@@ -19,4 +19,14 @@
       "test": "cake clean compile inst spec_better_lib test_better_lib"
     , "start": "cake compile run"
   }
+  , "testling": {
+      "browsers": [
+            "ie9", "ie10"
+          , "firefox/14", "firefox/15"
+          , "chrome/21", "chrome/22"
+          , "safari/5.0.5", "safari/5.1"
+      ]
+      , "harness" : "mocha"
+      , "files": "testling/*.coffee"
+  }
 }

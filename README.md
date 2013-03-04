@@ -1,6 +1,7 @@
 
+testling: [![browser support](http://ci.testling.com/katoy/triangle.png)](http://ci.testling.com/katoy/triangle)
 
-[![Build Status](https://travis-ci.org/katoy/triangle.png?branch=master)](undefined)
+travis: [![Build Status](https://travis-ci.org/katoy/triangle.png?branch=master)](https://travis-ci.org/katoy/triangle)
 
 USAGE
 ======
@@ -63,7 +64,7 @@ cake test_phantomjs では phantomjs をブラウザ代わりに使ってテス�
 cake test_jsTestriver では chrome, safarim firefox で一括にテストをします。
 
 次の処理を cake で行えるようにもしてあります。
- * クラス実装、テストケースの編集に伴う coffeescrit -> javascript の compile,
+ * クラス実装、テストケースの編集に伴う coffeescript -> javascript の compile,
  * テストカバレッジ計測機能を *.js に組み込む。
  * npm での modules のインストール
 

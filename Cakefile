@@ -88,6 +88,7 @@ task 'clean', 'Clean compiled *.js *~', ->
   run "rm -f test_jstestdriver/report/*"
   run "rm -fr  test_jstestdriver/html/*"
   run "rm -fr #{SRC_INST_DIR}"
+  run "rm -fr #{TEST_DIR}/*.js"
 
 # cake -e "development"
 option '-e', '--environment [ENVIRONMENT_NAME]', 'set the environment for `task:run` (production|development, default=development)'
