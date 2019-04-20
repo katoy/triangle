@@ -1,7 +1,7 @@
 
 testling: [![browser support](http://ci.testling.com/katoy/triangle.png)](http://ci.testling.com/katoy/triangle)
 
-travis: [![Build Status](https://travis-ci.org/katoy/triangle.png?branch=master)](https://travis-ci.org/katoy/triangle)
+travis: [![Build Status](https://travis-ci.org/katoy/triangle.png?branch=master)](https://travis-ci.org/katoy/triangle) [![Greenkeeper badge](https://badges.greenkeeper.io/katoy/triangle.svg)](https://greenkeeper.io/)
 
 USAGE
 ======
